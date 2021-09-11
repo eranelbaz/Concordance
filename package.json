@@ -1,0 +1,19 @@
+{
+  "name": "concordance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^16.6.1",
+    "prettier": "2.3.0",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
+  }
+}
