@@ -1,5 +1,5 @@
 import { createPool, Pool } from 'mysql';
-import { Song } from '../api';
+import { Song } from './api';
 import { outputFile } from 'fs-extra';
 import path from 'path';
 export const DATA_SOURCES = {
