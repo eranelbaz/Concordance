@@ -16,9 +16,9 @@
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",
-    "@types/node": "^16.6.1",
+    "@types/node": "16.11.41",
     "prettier": "2.3.0",
-    "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "ts-node": "10.8.1",
+    "typescript": "4.7.3"
   }
 }
