@@ -1,22 +1,16 @@
 CREATE DATABASE concordance;
 USE concordance;
 
-CREATE TABLE `metadata` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `value` varchar(255) NOT NULL
-);
-
 CREATE TABLE `documents` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `path` varchar(255) NOT NULL
 );
 
-CREATE TABLE `metadataToDocuments` (
+CREATE TABLE `metadata` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `metadataId` int,
-  `documentId` int,
-  FOREIGN KEY (metadataId) REFERENCES `metadata`(id),
+  `name` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `documentId` int NOT NULL,
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
 );
 

@@ -9,8 +9,13 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "csv-string": "^4.1.0",
+    "fs-extra": "^10.1.0",
+    "mysql": "^2.18.1"
+  },
   "devDependencies": {
+    "@types/mysql": "^2.15.21",
     "@types/node": "^16.6.1",
     "prettier": "2.3.0",
     "ts-node": "^10.2.0",
