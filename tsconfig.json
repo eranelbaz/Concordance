@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "es2019",
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
     "sourceMap": true,
-    "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "baseUrl": "src"
   },
   "exclude": [
     "node_modules"
   ],
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }

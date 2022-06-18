@@ -1,6 +1,6 @@
 import { loadDocument } from './load-document';
 
-await loadDocument(`
+loadDocument(`
 author,title,album,year,content
 author,title,album,year,content
-`);
+`).then(r => console.log(r));

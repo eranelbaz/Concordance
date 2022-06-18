@@ -1,7 +1,8 @@
 import { createPool, Pool } from 'mysql';
-import { Song } from './api';
 import { outputFile } from 'fs-extra';
 import path from 'path';
+import { Song } from 'api';
+
 export const DATA_SOURCES = {
   DB_HOST: process.env.MY_SQL_DB_HOST,
   DB_USER: process.env.MY_SQL_DB_USER,
