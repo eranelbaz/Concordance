@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "esnext",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "rootDir": "./src",
     "outDir": "dist",
     "esModuleInterop": true,
@@ -13,7 +13,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": true,
-
   },
   "include": [
     "src/**/*"

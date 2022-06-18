@@ -48,4 +48,5 @@ CREATE TABLE `groupsToWords` (
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
 );
 
-CREATE USER 'concordance'@'localhost' IDENTIFIED BY 'concordance';
+CREATE USER 'concordance'@'hostname' IDENTIFIED WITH mysql_native_password BY 'concordance';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON concordance.* TO 'concordance'@'localhost';

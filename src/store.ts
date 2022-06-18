@@ -1,28 +1,28 @@
-import { createPool, Pool } from 'mysql';
+import { createConnection, Connection } from 'mysql2/promise';
 import { outputFile } from 'fs-extra';
 import * as path from 'path';
 import type { Song } from './api';
-
-export const DATA_SOURCES = {
-  DB_HOST: process.env.MY_SQL_DB_HOST,
-  DB_USER: process.env.MY_SQL_DB_USER,
-  DB_PASSWORD: process.env.MY_SQL_DB_PASSWORD,
-  DB_PORT: process.env.MY_SQL_DB_PORT,
-  DB_DATABASE: process.env.MY_SQL_DB_DATABASE,
-  DB_CONNECTION_LIMIT: process.env.MY_SQL_DB_CONNECTION_LIMIT ? parseInt(process.env.MY_SQL_DB_CONNECTION_LIMIT) : 4
-};
-let pool: Pool;
 const SONGS_PATH = './songs';
-export const init = () => {
-  if (pool) return;
+export const DATA_SOURCES = {
+  DB_HOST: 'localhost',
+  DB_USER: 'concordance',
+  DB_PASSWORD: 'concordance',
+  DB_PORT: '3306',
+  DB_DATABASE: 'concordance'
+};
+
+let connection: Connection;
+
+export const init = async () => {
+  if (connection) return;
   try {
-    pool = createPool({
-      connectionLimit: DATA_SOURCES.DB_CONNECTION_LIMIT,
+    connection = await createConnection({
       host: DATA_SOURCES.DB_HOST,
       user: DATA_SOURCES.DB_USER,
       password: DATA_SOURCES.DB_PASSWORD,
       database: DATA_SOURCES.DB_DATABASE
     });
+    await execute('SELECT 1');
 
     console.debug('MySql Adapter Pool generated successfully');
   } catch (error) {
@@ -31,16 +31,11 @@ export const init = () => {
   }
 };
 
-const execute = <T>(query: string, params: string[] | Object = {}): Promise<T> => {
+const execute = async (query: string, params: string[] | Object = {}) => {
   try {
-    if (!pool) init();
+    if (!connection) await init();
 
-    return new Promise<T>((resolve, reject) => {
-      pool.query(query, params, (error, results) => {
-        if (error) reject(error);
-        else resolve(results);
-      });
-    });
+    return await connection.execute(query, params);
   } catch (error) {
     console.error('[mysql.connector][execute][Error]: ', error);
     throw new Error('failed to execute MySQL query');
@@ -57,9 +52,9 @@ INSERT INTO metadata (name, value) VALUES
                 ('year', '${year}'),
                 ('title', '${title}'),
                 ('author', '${album}');
-select LAST_INSERT_ID()`
+select LAST_INSERT_ID();`
   );
-  await execute<Song>(
+  await execute(
     `
 INSERT INTO metadata (name, value, documentId) VALUES 
                 ('album', '${album}', ${documentId}),
