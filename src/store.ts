@@ -3,10 +3,10 @@ import { outputFile } from 'fs-extra';
 import * as path from 'path';
 import type { Song } from './api';
 const SONGS_PATH = './songs';
-export const DATA_SOURCES = {
+export const DB_CONNECTION_DETAILS = {
   DB_HOST: 'localhost',
-  DB_USER: 'concordance',
-  DB_PASSWORD: 'concordance',
+  DB_USER: 'root',
+  DB_PASSWORD: 'root',
   DB_PORT: '3306',
   DB_DATABASE: 'concordance'
 };
@@ -17,10 +17,10 @@ export const init = async () => {
   if (connection) return;
   try {
     connection = await createConnection({
-      host: DATA_SOURCES.DB_HOST,
-      user: DATA_SOURCES.DB_USER,
-      password: DATA_SOURCES.DB_PASSWORD,
-      database: DATA_SOURCES.DB_DATABASE
+      host: DB_CONNECTION_DETAILS.DB_HOST,
+      user: DB_CONNECTION_DETAILS.DB_USER,
+      password: DB_CONNECTION_DETAILS.DB_PASSWORD,
+      database: DB_CONNECTION_DETAILS.DB_DATABASE
     });
     await execute('SELECT 1');
 
@@ -31,7 +31,7 @@ export const init = async () => {
   }
 };
 
-const execute = async (query: string, params: string[] | Object = {}) => {
+const execute = async (query: string, params: string[] | Object = []) => {
   try {
     if (!connection) await init();
 
@@ -45,15 +45,9 @@ const execute = async (query: string, params: string[] | Object = {}) => {
 export const saveSong = async ({ album, year, title, author }: Song, content) => {
   const savedContentPath = path.join(SONGS_PATH, author, title);
   await outputFile(savedContentPath, content);
-  const documentId = await execute(
-    `
-INSERT INTO metadata (name, value) VALUES 
-                ('album', '${album}'),
-                ('year', '${year}'),
-                ('title', '${title}'),
-                ('author', '${album}');
-select LAST_INSERT_ID();`
-  );
+  // @ts-ignore
+  const [{ insertedId: documentId }] = await execute(`INSERT INTO documents (path) VALUES ('${savedContentPath}');`);
+  console.log({ documentId });
   await execute(
     `
 INSERT INTO metadata (name, value, documentId) VALUES 
