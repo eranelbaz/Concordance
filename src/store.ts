@@ -1,7 +1,7 @@
 import { createPool, Pool } from 'mysql';
 import { outputFile } from 'fs-extra';
-import path from 'path';
-import { Song } from 'api';
+import * as path from 'path';
+import type { Song } from './api';
 
 export const DATA_SOURCES = {
   DB_HOST: process.env.MY_SQL_DB_HOST,
@@ -33,7 +33,7 @@ export const init = () => {
 
 const execute = <T>(query: string, params: string[] | Object = {}): Promise<T> => {
   try {
-    if (!pool) throw new Error('Pool was not created. Ensure pool is created when running the app.');
+    if (!pool) init();
 
     return new Promise<T>((resolve, reject) => {
       pool.query(query, params, (error, results) => {

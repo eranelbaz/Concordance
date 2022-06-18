@@ -47,3 +47,5 @@ CREATE TABLE `groupsToWords` (
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
 );
+
+CREATE USER 'concordance'@'localhost' IDENTIFIED BY 'concordance';

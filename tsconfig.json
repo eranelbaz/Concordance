@@ -1,17 +1,24 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    "module": "esnext",
+    "baseUrl": ".",
+    "rootDir": "./src",
+    "outDir": "dist",
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "resolveJsonModule": true,
-    "baseUrl": "src"
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": true,
+
   },
-  "exclude": [
-    "node_modules"
-  ],
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
