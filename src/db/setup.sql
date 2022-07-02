@@ -1,22 +1,16 @@
 CREATE DATABASE concordance;
 USE concordance;
 
-CREATE TABLE `metadata` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `value` varchar(255) NOT NULL
-);
-
 CREATE TABLE `documents` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `path` varchar(255) NOT NULL
 );
 
-CREATE TABLE `metadataToDocuments` (
+CREATE TABLE `metadata` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `metadataId` int,
-  `documentId` int,
-  FOREIGN KEY (metadataId) REFERENCES `metadata`(id),
+  `name` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `documentId` int NOT NULL,
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
 );
 
@@ -53,3 +47,6 @@ CREATE TABLE `groupsToWords` (
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
 );
+
+CREATE USER 'concordance'@'localhost' IDENTIFIED WITH mysql_native_password BY 'concordance';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON concordance.* TO 'concordance'@'localhost';

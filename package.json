@@ -2,18 +2,26 @@
   "name": "concordance",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --loader ts-node/esm --experimental-modules --es-module-specifier-resolution=node src/index.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "csv-string": "4.1.0",
+    "dotenv": "16.0.1",
+    "fs-extra": "^10.1.0",
+    "mysql2": "2.3.3"
+  },
   "devDependencies": {
-    "@types/node": "^16.6.1",
+    "@tsconfig/esm": "1.0.1",
+    "@types/node": "16.11.41",
     "prettier": "2.3.0",
-    "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "ts-node": "10.8.1",
+    "typescript": "4.7.3"
   }
 }
