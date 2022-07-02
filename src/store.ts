@@ -47,7 +47,6 @@ export const saveSong = async ({ album, year, title, author }: Song, content) =>
   await outputFile(savedContentPath, content);
   // @ts-ignore
   const [{ insertedId: documentId }] = await execute(`INSERT INTO documents (path) VALUES ('${savedContentPath}');`);
-  console.log({ documentId });
   await execute(
     `
 INSERT INTO metadata (name, value, documentId) VALUES 
