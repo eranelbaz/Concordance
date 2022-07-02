@@ -42,11 +42,11 @@ const execute = async (query: string, params: string[] | Object = []) => {
   }
 };
 
-export const saveSong = async ({ album, year, title, author }: Song, content) => {
+export const saveSong = async ({ album, year, title, author }: Song, content): Promise<number> => {
   const savedContentPath = path.join(SONGS_PATH, author, title);
   await outputFile(savedContentPath, content);
   // @ts-ignore
-  const [{ insertedId: documentId }] = await execute(`INSERT INTO documents (path) VALUES ('${savedContentPath}');`);
+  const [{ insertId: documentId }] = await execute(`INSERT INTO documents (path) VALUES ('${savedContentPath}');`);
   await execute(
     `
 INSERT INTO metadata (name, value, documentId) VALUES 
@@ -55,5 +55,22 @@ INSERT INTO metadata (name, value, documentId) VALUES
                 ('title', '${title}', ${documentId}),
                 ('author', '${album}', ${documentId});
 `
+  );
+  return documentId;
+};
+
+export const saveWordsOfDocument = async (words: string[], documentId: number) => {
+  // @ts-ignore
+  await Promise.all(
+    words.map(async word => {
+      // @ts-ignore
+      await execute(`INSERT IGNORE INTO words (word) VALUES ('${word}');`);
+      // @ts-ignore
+      const [[{ id: wordId }]] = await execute(`SELECT id from words where word = '${word}'`);
+      console.log({ wordId });
+      await execute(`
+  INSERT IGNORE INTO wordsToDocuments (wordId, documentId) VALUES
+                    (${wordId},  ${documentId});`);
+    })
   );
 };

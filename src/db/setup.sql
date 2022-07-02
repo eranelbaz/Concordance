@@ -16,7 +16,8 @@ CREATE TABLE `metadata` (
 
 CREATE TABLE `words` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `word` varchar(255) NOT NULL
+  `word` varchar(255) NOT NULL,
+  UNIQUE (word)
 );
 
 CREATE TABLE `wordsToDocuments` (
@@ -25,6 +26,7 @@ CREATE TABLE `wordsToDocuments` (
   `documentId` int,
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
+  UNIQUE (wordId,documentId)
 );
 
 CREATE TABLE `groupsTypes` (
