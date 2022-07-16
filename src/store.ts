@@ -2,6 +2,8 @@ import { createConnection, Connection } from 'mysql2/promise';
 import { outputFile } from 'fs-extra';
 import * as path from 'path';
 import type { Song } from './api';
+import { uuid } from 'uuidv4';
+
 const SONGS_PATH = './songs';
 export const DB_CONNECTION_DETAILS = {
   DB_HOST: 'localhost',
@@ -42,14 +44,15 @@ const execute = async (query: string, params: string[] | Object = []) => {
   }
 };
 
-export const saveSong = async ({ album, year, title, author }: Song, content): Promise<number> => {
+export const saveSong = async ({ album, year, title, author }: Song, content): Promise<string> => {
   const savedContentPath = path.join(SONGS_PATH, author, title);
   await outputFile(savedContentPath, content);
+  const documentId = uuid();
   // @ts-ignore
-  const [{ insertId: documentId }] = await execute(`INSERT INTO documents (path) VALUES ('${savedContentPath}');`);
+  await execute(`INSERT INTO documents (id, path) VALUES ('${documentId}', '${savedContentPath}');`);
   await execute(
     `
-INSERT INTO metadata (name, value, documentId) VALUES 
+INSERT INTO metadata (id, name, value, documentId) VALUES 
                 ('album', '${album}', ${documentId}),
                 ('year', '${year}', ${documentId}),
                 ('title', '${title}', ${documentId}),
@@ -63,13 +66,12 @@ export const saveWordsOfDocument = async (words: string[], documentId: number) =
   // @ts-ignore
   await Promise.all(
     words.map(async word => {
+      const wordId = uuid();
+      await execute(`INSERT IGNORE INTO words (id, word) VALUES ('${wordId}','${word}');`);
       // @ts-ignore
-      await execute(`INSERT IGNORE INTO words (word) VALUES ('${word}');`);
-      // @ts-ignore
-      const [[{ id: wordId }]] = await execute(`SELECT id from words where word = '${word}'`);
       await execute(`
-  INSERT IGNORE INTO wordsToDocuments (wordId, documentId) VALUES
-                    (${wordId},  ${documentId});`);
+  INSERT IGNORE INTO wordsToDocuments (id, wordId, documentId) VALUES
+                    ('${uuid()}', ${wordId},  ${documentId});`);
     })
   );
 };
