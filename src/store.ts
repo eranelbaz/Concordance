@@ -61,17 +61,17 @@ INSERT INTO metadata (id, name, value, documentId) VALUES
   );
   return documentId;
 };
-
+// TODO Check the uuid conversion works
 export const saveWordsOfDocument = async (words: string[], documentId: number) => {
+  const wordIds = Array.from({ length: words.length }, () => uuid());
+  const sqlValuesForWordsTable = words.map((word, wordIndex) => `('${wordIds[wordIndex]}', '${word}')`).join(',');
+  const sqlValuesForWordsToDocumentsTable = words
+    .map((word, wordIndex) => `('${uuid()}', ${wordIds[wordIndex]},  ${documentId})`)
+    .join(',');
   // @ts-ignore
-  await Promise.all(
-    words.map(async word => {
-      const wordId = uuid();
-      await execute(`INSERT IGNORE INTO words (id, word) VALUES ('${wordId}','${word}');`);
-      // @ts-ignore
-      await execute(`
+  await execute(`INSERT IGNORE INTO words (id, word) VALUES ${sqlValuesForWordsTable};`);
+  // @ts-ignore
+  await execute(`
   INSERT IGNORE INTO wordsToDocuments (id, wordId, documentId) VALUES
-                    ('${uuid()}', ${wordId},  ${documentId});`);
-    })
-  );
+                    ${sqlValuesForWordsToDocumentsTable};`);
 };
