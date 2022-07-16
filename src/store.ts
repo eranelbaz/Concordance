@@ -67,7 +67,6 @@ export const saveWordsOfDocument = async (words: string[], documentId: number) =
       await execute(`INSERT IGNORE INTO words (word) VALUES ('${word}');`);
       // @ts-ignore
       const [[{ id: wordId }]] = await execute(`SELECT id from words where word = '${word}'`);
-      console.log({ wordId });
       await execute(`
   INSERT IGNORE INTO wordsToDocuments (wordId, documentId) VALUES
                     (${wordId},  ${documentId});`);
