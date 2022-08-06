@@ -27,7 +27,7 @@ CREATE TABLE `wordsToDocuments` (
   `wordIndex` int,
   `documentId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
-  FOREIGN KEY (documentId) REFERENCES `documents`(id)
+  FOREIGN KEY (documentId) REFERENCES `documents`(id),
   UNIQUE (wordId,documentId)
 );
 
@@ -40,14 +40,14 @@ CREATE TABLE `groupsTypes` (
 CREATE TABLE `groups` (
   `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL,
-  `type` int,
+  `type` varchar(36),
   FOREIGN KEY (type) REFERENCES `groupsTypes`(id)
 );
 
 CREATE TABLE `groupsToWords` (
   `id` varchar(36) PRIMARY KEY,
-  `groupId` int,
-  `wordId` int,
+  `groupId` varchar(36),
+  `wordId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
 );
