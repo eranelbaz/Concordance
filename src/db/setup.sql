@@ -10,7 +10,7 @@ CREATE TABLE `metadata` (
   `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
-  `documentId` int NOT NULL,
+  `documentId` varchar(36) NOT NULL,
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
 );
 
@@ -22,8 +22,10 @@ CREATE TABLE `words` (
 
 CREATE TABLE `wordsToDocuments` (
   `id` varchar(36) PRIMARY KEY,
-  `wordId` int,
-  `documentId` int,
+  `wordId` varchar(36),
+  `lineIndex` int,
+  `wordIndex` int,
+  `documentId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
   UNIQUE (wordId,documentId)

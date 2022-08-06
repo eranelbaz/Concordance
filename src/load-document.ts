@@ -1,6 +1,5 @@
 import * as csv from 'csv-string';
 import { saveSong, saveWordsOfDocument } from './store';
-import _ from 'lodash';
 
 export const loadDocument = async (content: string) => {
   const parsedCsv = csv.parse(content, { output: 'objects' });
@@ -11,7 +10,8 @@ export const loadDocument = async (content: string) => {
       const songContent = row['content'];
       const songId = await saveSong(row as any, songContent);
 
-      let words = _(songContent).split('\n').split(' ').flatten().value();
+      const lines = songContent.split('\n'); //_(songContent).split('\n').split(' ').value();
+      const words = lines.map(line => line.split(' '));
       await saveWordsOfDocument(words, songId);
     })
   );

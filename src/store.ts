@@ -62,16 +62,23 @@ INSERT INTO metadata (id, name, value, documentId) VALUES
   return documentId;
 };
 
-export const saveWordsOfDocument = async (words: string[], documentId: number) => {
-  const wordIds = Array.from({ length: words.length }, () => uuid());
-  const sqlValuesForWordsTable = words.map((word, wordIndex) => `('${wordIds[wordIndex]}', '${word}')`).join(',');
-  const sqlValuesForWordsToDocumentsTable = words
-    .map((word, wordIndex) => `('${uuid()}', ${wordIds[wordIndex]},  ${documentId})`)
+export const saveWordsOfDocument = async (lines: string[][], documentId: string) => {
+  const wordsMetadata = lines.flatMap((line, lineIndex) =>
+    line.flatMap((word, wordIndex) => ({
+      id: uuid(),
+      lineIndex,
+      wordIndex,
+      word
+    }))
+  );
+  const sqlValuesForWordsTable = wordsMetadata.map(({ id, word }) => `('${id}', '${word}')`);
+  const sqlValuesForWordsToDocumentsTable = wordsMetadata
+    .map(({ id, lineIndex, wordIndex }) => `('${uuid()}', ${lineIndex}, ${wordIndex}, ${id}, ${documentId})`)
     .join(',');
   // @ts-ignore
   await execute(`INSERT IGNORE INTO words (id, word) VALUES ${sqlValuesForWordsTable};`);
   // @ts-ignore
   await execute(`
-  INSERT IGNORE INTO wordsToDocuments (id, wordId, documentId) VALUES
+  INSERT IGNORE INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
                     ${sqlValuesForWordsToDocumentsTable};`);
 };
