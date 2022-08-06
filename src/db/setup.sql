@@ -2,12 +2,12 @@ CREATE DATABASE concordance;
 USE concordance;
 
 CREATE TABLE `documents` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `path` varchar(255) NOT NULL
 );
 
 CREATE TABLE `metadata` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
   `documentId` int NOT NULL,
@@ -15,13 +15,13 @@ CREATE TABLE `metadata` (
 );
 
 CREATE TABLE `words` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `word` varchar(255) NOT NULL,
   UNIQUE (word)
 );
 
 CREATE TABLE `wordsToDocuments` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `wordId` int,
   `documentId` int,
   FOREIGN KEY (wordId) REFERENCES `words`(id),
@@ -30,20 +30,20 @@ CREATE TABLE `wordsToDocuments` (
 );
 
 CREATE TABLE `groupsTypes` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL
 );
 
 
 CREATE TABLE `groups` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL,
   `type` int,
   FOREIGN KEY (type) REFERENCES `groupsTypes`(id)
 );
 
 CREATE TABLE `groupsToWords` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` varchar(36) PRIMARY KEY,
   `groupId` int,
   `wordId` int,
   FOREIGN KEY (wordId) REFERENCES `words`(id),
