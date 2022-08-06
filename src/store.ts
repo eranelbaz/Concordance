@@ -61,7 +61,7 @@ INSERT INTO metadata (id, name, value, documentId) VALUES
   );
   return documentId;
 };
-// TODO Check the uuid conversion works
+
 export const saveWordsOfDocument = async (words: string[], documentId: number) => {
   const wordIds = Array.from({ length: words.length }, () => uuid());
   const sqlValuesForWordsTable = words.map((word, wordIndex) => `('${wordIds[wordIndex]}', '${word}')`).join(',');
