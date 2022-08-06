@@ -53,10 +53,10 @@ export const saveSong = async ({ album, year, title, author }: Song, content): P
   await execute(
     `
 INSERT INTO metadata (id, name, value, documentId) VALUES 
-                ('album', '${album}', ${documentId}),
-                ('year', '${year}', ${documentId}),
-                ('title', '${title}', ${documentId}),
-                ('author', '${album}', ${documentId});
+                ('${uuid()}', 'album', '${album}', '${documentId}'),
+                ('${uuid()}', 'year', '${year}',   '${documentId}'),
+                ('${uuid()}', 'title', '${title}', '${documentId}'),
+                ('${uuid()}', 'author', '${album}','${documentId}');
 `
   );
   return documentId;
@@ -73,12 +73,16 @@ export const saveWordsOfDocument = async (lines: string[][], documentId: string)
   );
   const sqlValuesForWordsTable = wordsMetadata.map(({ id, word }) => `('${id}', '${word}')`);
   const sqlValuesForWordsToDocumentsTable = wordsMetadata
-    .map(({ id, lineIndex, wordIndex }) => `('${uuid()}', ${lineIndex}, ${wordIndex}, ${id}, ${documentId})`)
+    .map(({ id, lineIndex, wordIndex }) => `('${uuid()}', ${lineIndex}, ${wordIndex}, '${id}', '${documentId}')`)
     .join(',');
-  // @ts-ignore
-  await execute(`INSERT IGNORE INTO words (id, word) VALUES ${sqlValuesForWordsTable};`);
-  // @ts-ignore
-  await execute(`
-  INSERT IGNORE INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
-                    ${sqlValuesForWordsToDocumentsTable};`);
+  console.log('a');
+  await execute(`INSERT INTO words (id, word) VALUES ${sqlValuesForWordsTable};`);
+
+  console.log('b');
+  const a = `INSERT INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
+                    ${sqlValuesForWordsToDocumentsTable};`;
+
+  console.log(a);
+  await execute(a);
+  console.log('c');
 };
