@@ -1,9 +1,11 @@
+DROP DATABASE concordance;
 CREATE DATABASE concordance;
 USE concordance;
 
 CREATE TABLE `documents` (
   `id` varchar(36) PRIMARY KEY,
-  `path` varchar(255) NOT NULL
+  `path` varchar(255) NOT NULL,
+   UNIQUE (path)
 );
 
 CREATE TABLE `metadata` (

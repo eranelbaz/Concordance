@@ -1,8 +1,9 @@
 import { createConnection, Connection } from 'mysql2/promise';
 import { outputFile } from 'fs-extra';
 import * as path from 'path';
-import type { Song } from './api';
+import type { InputDocument, DocumentMetadata } from 'api';
 import { uuid } from 'uuidv4';
+import { Document, Word } from './models';
 
 const SONGS_PATH = './songs';
 export const DB_CONNECTION_DETAILS = {
@@ -34,9 +35,9 @@ export const init = async () => {
 };
 
 const execute = async (query: string, params: string[] | Object = []) => {
+  console.log(`executing ${query}`);
   try {
     if (!connection) await init();
-
     return await connection.execute(query, params);
   } catch (error) {
     console.error('[mysql.connector][execute][Error]: ', error);
@@ -44,8 +45,10 @@ const execute = async (query: string, params: string[] | Object = []) => {
   }
 };
 
-export const saveSong = async ({ album, year, title, author }: Song, content): Promise<string> => {
-  const savedContentPath = path.join(SONGS_PATH, author, title);
+const buildSongPath = (author: string, title: string) => path.join(SONGS_PATH, author, title);
+
+export const saveSong = async ({ album, year, title, author, content }: InputDocument): Promise<string> => {
+  const savedContentPath = buildSongPath(author, title);
   await outputFile(savedContentPath, content);
   const documentId = uuid();
   // @ts-ignore
@@ -62,27 +65,44 @@ INSERT INTO metadata (id, name, value, documentId) VALUES
   return documentId;
 };
 
+const queryWord = async (word: string) => {
+  const data = await execute(`SELECT * FROM words WHERE word = '${word}'`);
+  return data[0][0] as Word;
+};
+
+export const queryDocument = async (document: DocumentMetadata) => {
+  const songPath = buildSongPath(document.author, document.title);
+  const data = await execute(`SELECT * FROM documents WHERE path = '${songPath}'`);
+  return data[0][0] as Document;
+};
+
 export const saveWordsOfDocument = async (lines: string[][], documentId: string) => {
-  const wordsMetadata = lines.flatMap((line, lineIndex) =>
-    line.flatMap((word, wordIndex) => ({
-      id: uuid(),
-      lineIndex,
-      wordIndex,
-      word
-    }))
+  // BUG NEED TO RUN PROMISE ONE BY ONE AND NOT ALL
+  await Promise.all(
+    lines.flatMap((line, lineIndex) =>
+      line.flatMap(async (word, wordIndex) => {
+        const wordDBData = await queryWord(word);
+        const isWordExists = !!wordDBData;
+        console.log(`the word ${word} exists = ${isWordExists}`);
+        const wordMetadata = {
+          id: isWordExists ? wordDBData.id : uuid(),
+          lineIndex,
+          wordIndex,
+          word
+        };
+        if (!isWordExists) {
+          await execute(`INSERT INTO words (id, word) VALUES ('${wordMetadata.id}', '${wordMetadata.word}');`);
+        }
+        await execute(`INSERT INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
+                    ('${uuid()}', ${lineIndex}, ${wordIndex}, '${wordMetadata.id}', '${documentId}');`);
+      })
+    )
   );
-  const sqlValuesForWordsTable = wordsMetadata.map(({ id, word }) => `('${id}', '${word}')`);
-  const sqlValuesForWordsToDocumentsTable = wordsMetadata
-    .map(({ id, lineIndex, wordIndex }) => `('${uuid()}', ${lineIndex}, ${wordIndex}, '${id}', '${documentId}')`)
-    .join(',');
-  console.log('a');
-  await execute(`INSERT INTO words (id, word) VALUES ${sqlValuesForWordsTable};`);
+};
 
-  console.log('b');
-  const a = `INSERT INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
-                    ${sqlValuesForWordsToDocumentsTable};`;
-
-  console.log(a);
-  await execute(a);
-  console.log('c');
+export const clearDb = async () => {
+  await execute('DELETE FROM `metadata`;');
+  await execute('DELETE FROM `documents`;');
+  await execute('DELETE FROM `wordsToDocuments`;');
+  await execute('DELETE FROM `words`;');
 };
