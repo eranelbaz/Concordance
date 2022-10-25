@@ -5,6 +5,7 @@
 - [ ] store word groups
 - [ ] store language sentence
 - [ ] Query statistics over words
+- [ ] Fix login without root
 - [ ] Flush to disk after writing document
 # FE
 - [ ] Allow to insert new document
