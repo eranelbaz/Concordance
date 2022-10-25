@@ -7,6 +7,22 @@
 - [ ] Query statistics over words
 - [ ] Fix login without root
 - [ ] Flush to disk after writing document
+
+# BE
+- [ ] Route to load document
+- [ ] Route to query document by metadata
+- [ ] Route to query by words in document
+- [ ] Route to get words of document/s/all db with positions 
+- [ ] Route to show word in context (some before some after)
+- [ ] Route to query word by positin in text
+- [ ] Route to add new group of words
+- [ ] Route to add word to group
+- [ ] Route to add ordered group (ביטוי לשוני)
+- [ ] Route to check if ordered group in text
+- [ ] Route to get words position of ordered group
+- [ ] Route to get stats
+
+
 # FE
 - [ ] Allow to insert new document
 - [ ] Allow to query by document metadata and by words
