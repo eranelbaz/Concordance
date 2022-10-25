@@ -33,17 +33,9 @@ CREATE TABLE `wordsToDocuments` (
   UNIQUE (wordId,documentId)
 );
 
-CREATE TABLE `groupsTypes` (
-  `id` varchar(36) PRIMARY KEY,
-  `name` varchar(255) NOT NULL
-);
-
-
 CREATE TABLE `groups` (
   `id` varchar(36) PRIMARY KEY,
-  `name` varchar(255) NOT NULL,
-  `type` varchar(36),
-  FOREIGN KEY (type) REFERENCES `groupsTypes`(id)
+  `name` varchar(255) NOT NULL
 );
 
 CREATE TABLE `groupsToWords` (
