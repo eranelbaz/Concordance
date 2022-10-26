@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
 import { loadDocument } from './load-document';
-dotenv.config();
 
 const documents = [
   {

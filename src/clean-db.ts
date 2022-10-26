@@ -1,5 +1,8 @@
-import dotenv from 'dotenv';
-import { clearDb } from './db/store';
-dotenv.config();
+import { execute } from './db/stores/common';
 
-clearDb();
+export const clearDb = async () => {
+  await execute('DELETE FROM `metadata`;');
+  await execute('DELETE FROM `documents`;');
+  await execute('DELETE FROM `wordsToDocuments`;');
+  await execute('DELETE FROM `words`;');
+};
