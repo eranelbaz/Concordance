@@ -26,13 +26,21 @@
 //   });
 //   return result;
 // }
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
+import { loadDocument } from './load-document';
 
 const app = express();
 const port = 3001;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.use(cors());
+app.use(bodyParser.json());
+
+app.post('/load', async (req, res) => {
+  console.log(req.body);
+  await loadDocument(req.body);
+  res.send('');
 });
 
 app.listen(port, () => {

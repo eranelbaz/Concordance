@@ -15,9 +15,9 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'Backoffice',
+  title: 'Concordance',
   pwa: false,
-  logo: 'https://svgshare.com/i/mZo.svg',
+  logo: '',
   iconfontUrl: ''
 };
 

@@ -1,6 +1,6 @@
-import { InputDocument } from '@/be/api';
-import { queryDocument, saveDocument } from '@/be/db/stores/documents';
-import { saveWordsOfDocument } from '@/be/db/stores/words';
+import { InputDocument } from './api';
+import { queryDocument, saveDocument } from './db/stores/documents';
+import { saveWordsOfDocument } from './db/stores/words';
 
 export const loadDocument = async (document: InputDocument) => {
   const isDocumentExists = !(await queryDocument(document));

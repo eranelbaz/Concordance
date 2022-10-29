@@ -1,6 +1,6 @@
-import { Word } from '@/be/db/models';
-import { execute } from '@/be/db/stores/common';
 import { uuid } from 'uuidv4';
+import { Word } from '../models';
+import { execute } from './common';
 
 const queryWord = async (word: string) => {
   const data = await execute(`SELECT * FROM words WHERE word = '${word}'`);

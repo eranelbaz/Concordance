@@ -1,9 +1,8 @@
-import { DocumentMetadata, InputDocument } from '@/be/api';
-import { Document } from '@/be/db/models';
-import { execute } from '@/be/db/stores/common';
-import { outputFile } from 'fs-extra';
 import * as path from 'path';
 import { uuid } from 'uuidv4';
+import { DocumentMetadata, InputDocument } from '../../api';
+import { Document } from '../models';
+import { execute } from './common';
 
 const SONGS_PATH = './songs';
 
@@ -17,7 +16,7 @@ export const queryDocument = async (document: DocumentMetadata) => {
 
 export const saveDocument = async ({ album, year, title, author, content }: InputDocument): Promise<string> => {
   const savedContentPath = buildDocumentPath(author, title);
-  await outputFile(savedContentPath, content);
+  // await outputFile(savedContentPath, content);
   const documentId = uuid();
   // @ts-ignore
   await execute(`INSERT INTO documents (id, path) VALUES ('${documentId}', '${savedContentPath}');`);

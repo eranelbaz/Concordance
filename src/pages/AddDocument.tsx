@@ -1,48 +1,50 @@
-// import { saveWordsOfDocument } from '@/be/db/stores/words';
+import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
-import { Card } from 'antd';
+import { Button, Card, Form } from 'antd';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 const AddDocument: React.FC = () => {
-  const { register, trigger, handleSubmit } = useForm();
-  const onSubmit = async (data, e) => {};
-  const onError = (errors, e) => console.log(errors, e);
+  const { register, getValues } = useForm();
+  const onSubmit = async () => {
+    const data = getValues();
+    console.log(data);
+    await post('/load', data);
+  };
   return (
     <PageContainer content={'Add Document'}>
       <Card>
-        <form onSubmit={handleSubmit(onSubmit, onError)}>
-          <input {...register('author', { required: true })} />
-          <input {...register('title', { required: true })} />
-          <input {...register('album', { required: true })} />
-          <input type={'number'} {...register('year', { required: true })} />
-          <input {...register('content', { required: true })} />
-          <button
-            type="button"
-            onClick={async () => {
-              const result = await trigger('author');
-              console.log(result);
-              // const result = await trigger("lastName", { shouldFocus: true }); allowed to focus input
-            }}>
-            Trigger
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
-              const result = await trigger(['title', 'album']);
-              console.log(result);
-            }}>
-            Trigger Multiple
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              trigger();
-            }}>
-            Trigger All
-          </button>
-          <button type="submit">Submit</button>
-        </form>
+        <Form
+          labelAlign={'left'}
+          name="basic"
+          labelCol={{
+            span: 2
+          }}
+          wrapperCol={{
+            span: 3
+          }}
+          autoComplete="off">
+          <Form.Item label={'author'}>
+            <input {...register('author', { required: true })} />
+          </Form.Item>
+          <Form.Item label={'title'}>
+            <input {...register('title', { required: true })} />
+          </Form.Item>
+          <Form.Item label={'album'}>
+            <input {...register('album', { required: true })} />
+          </Form.Item>
+          <Form.Item label={'year'}>
+            <input type={'number'} {...register('year', { required: true })} />
+          </Form.Item>
+          <Form.Item label={'content'}>
+            <textarea {...register('content', { required: true })} rows={10} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={() => onSubmit()}>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
       </Card>
     </PageContainer>
   );
