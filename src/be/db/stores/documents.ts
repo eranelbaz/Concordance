@@ -3,6 +3,7 @@ import { uuid } from 'uuidv4';
 import { DocumentMetadata, InputDocument } from '../../api';
 import { Document } from '../models';
 import { execute } from './common';
+import { storeMetadata } from './metadata';
 
 const SONGS_PATH = './songs';
 
@@ -14,20 +15,13 @@ export const queryDocument = async (document: DocumentMetadata) => {
   return data[0][0] as Document;
 };
 
-export const saveDocument = async ({ album, year, title, author, content }: InputDocument): Promise<string> => {
-  const savedContentPath = buildDocumentPath(author, title);
+export const saveDocument = async (document: InputDocument): Promise<string> => {
+  const savedContentPath = buildDocumentPath(document.author, document.title);
   // await outputFile(savedContentPath, content);
   const documentId = uuid();
   // @ts-ignore
   await execute(`INSERT INTO documents (id, path) VALUES ('${documentId}', '${savedContentPath}');`);
-  await execute(
-    `
-INSERT INTO metadata (id, name, value, documentId) VALUES
-                ('${uuid()}', 'album', '${album}', '${documentId}'),
-                ('${uuid()}', 'year', '${year}',   '${documentId}'),
-                ('${uuid()}', 'title', '${title}', '${documentId}'),
-                ('${uuid()}', 'author', '${album}','${documentId}');
-`
-  );
+  await storeMetadata(documentId, document);
+
   return documentId;
 };

@@ -1,15 +1,17 @@
 import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Card, Form } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const AddDocument: React.FC = () => {
   const { register, getValues } = useForm();
+  const [result, setResult] = useState('');
   const onSubmit = async () => {
     const data = getValues();
     console.log(data);
-    await post('/load', data);
+    const response = await post('/load', data);
+    setResult(response.data);
   };
   return (
     <PageContainer content={'Add Document'}>
@@ -44,6 +46,7 @@ const AddDocument: React.FC = () => {
               Submit
             </Button>
           </Form.Item>
+          <label>{result}</label>
         </Form>
       </Card>
     </PageContainer>

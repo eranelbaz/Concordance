@@ -29,6 +29,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
+import { getMetadataByDocumentId } from './db/stores/metadata';
 import { loadDocument } from './load-document';
 
 const app = express();
@@ -38,9 +39,19 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post('/load', async (req, res) => {
-  console.log(req.body);
-  await loadDocument(req.body);
-  res.send('');
+  const body = req.body;
+  console.log('load document', { body });
+
+  res.send(await loadDocument(body));
+});
+
+app.post('/search', async (req, res) => {
+  const body = req.body;
+  console.log('searching documents', { body });
+
+  const documents = await getMetadataByDocumentId(body);
+
+  res.json(documents);
 });
 
 app.listen(port, () => {

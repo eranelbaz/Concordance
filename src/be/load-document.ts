@@ -6,6 +6,7 @@ export const loadDocument = async (document: InputDocument) => {
   const isDocumentExists = !(await queryDocument(document));
   if (!isDocumentExists) {
     console.log(`Skipping`, { document });
+    return 'skip';
   } else {
     console.log(`Loading`, { document });
     const songId = await saveDocument(document);
@@ -13,5 +14,6 @@ export const loadDocument = async (document: InputDocument) => {
     const lines = document.content.split('\n');
     const words = lines.map(line => line.split(' '));
     await saveWordsOfDocument(words, songId);
+    return 'load';
   }
 };

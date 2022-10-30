@@ -9,7 +9,7 @@
 - [ ] Flush to disk after writing document
 
 # BE
-- [ ] Route to load document
+- [x] Route to load document
 - [ ] Route to query document by metadata
 - [ ] Route to query by words in document
 - [ ] Route to get words of document/s/all db with positions 
@@ -24,7 +24,7 @@
 
 
 # FE
-- [ ] Allow to insert new document
+- [x] Allow to insert new document
 - [ ] Allow to query by document metadata and by words
 - [ ] Query words by documents
     - [ ]  allow to get the next / previous word

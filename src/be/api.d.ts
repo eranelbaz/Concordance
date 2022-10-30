@@ -5,4 +5,4 @@ export type DocumentMetadata = {
   year: string;
 };
 
-export type InputDocument = Song & { content: string };
+export type InputDocument = DocumentMetadata & { content: string };

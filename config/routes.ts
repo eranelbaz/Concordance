@@ -6,7 +6,7 @@ export default [
   },
   { path: '/welcome', name: 'Welcome', icon: 'smile', component: './Welcome' },
   { path: '/add', name: 'add document', icon: 'smile', component: './AddDocument' },
-  { name: 'Search Table', icon: 'table', path: '/list', component: './TableList' },
+  { path: '/query', name: 'query document', icon: 'table', component: './QueryDocument' },
   { path: '/', redirect: '/welcome' },
   { path: '*', layout: false, component: './404' }
 ];

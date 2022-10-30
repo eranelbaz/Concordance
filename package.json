@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start_be": "node --loader ts-node/esm --experimental-modules --es-module-specifier-resolution=node src/be/index.ts",
+    "start_be_watch": "nodemon --watch './src/be/**/*.ts' --exec 'node --loader ts-node/esm --experimental-modules --es-module-specifier-resolution=node' src/be/index.ts",
     "clean": "node --loader ts-node/esm --experimental-modules --es-module-specifier-resolution=node src/clean-db.ts",
     "analyze": "cross-env ANALYZE=1 max build",
     "build": "max build",
