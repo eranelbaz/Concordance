@@ -34,14 +34,15 @@ export const getMetadataByDocumentId = async (document: Partial<DocumentMetadata
     await Promise.all(yearData.map(d => execute(`SELECT * from metadata where documentId = '${d.documentId}'`)))
   ).map(([data]) => data) as Metadata[][];
 
+  return groupMetadata(data.flat());
+};
+
+export const groupMetadata = (data: Metadata[]) => {
   const groupedData = {};
-  data?.forEach(metadataByDocumentId => {
-    metadataByDocumentId.forEach(metadata => {
-      const group = groupedData[metadata.documentId] || {};
-      group[metadata.name] = metadata.value;
-      groupedData[metadata.documentId] = group;
-    });
+  data?.forEach(metadata => {
+    const group = groupedData[metadata.documentId] || {};
+    group[metadata.name] = metadata.value;
+    groupedData[metadata.documentId] = group;
   });
-  console.log(groupedData);
   return groupedData;
 };

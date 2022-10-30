@@ -7,21 +7,28 @@ import { useForm } from 'react-hook-form';
 
 const AddDocument: React.FC = () => {
   const { register, getValues } = useForm();
-  const [result, setResult] = useState<[{ author: string; album: string; title: string; year: string; id: string }]>(
+  const [result, setResult] = useState<{ author: string; album: string; title: string; year: string; id: string }[]>(
     []
   );
-  const onSubmit = async () => {
+  const onMetadataSubmit = async () => {
     const formData = _.omitBy(getValues(), _.isNil);
 
-    const { data } = await post('/search', formData);
+    const { data } = await post('/searchMetadata', formData);
 
     // @ts-ignore
     setResult(Object.keys(data).map(key => ({ ...data[key], id: key })));
   };
-  console.log(result);
+  const onContentSubmit = async () => {
+    const content = _.omitBy(getValues(), _.isNil)['content'].split(' ');
+    const { data } = await post('/searchContent', content);
+
+    // @ts-ignore
+    setResult(Object.keys(data).map(key => ({ ...data[key], id: key })));
+  };
   return (
     <PageContainer content={'Query Document'}>
       <Card>
+        <h1>By Metadata</h1>
         <Form
           labelAlign={'left'}
           name="basic"
@@ -44,15 +51,36 @@ const AddDocument: React.FC = () => {
           <Form.Item label={'year'}>
             <input type={'number'} {...register('year')} />
           </Form.Item>
-          <Form.Item label={'content'}>
-            <textarea {...register('content')} rows={10} />
-          </Form.Item>
           <Form.Item>
-            <Button type="primary" onClick={() => onSubmit()}>
+            <Button type="primary" onClick={() => onMetadataSubmit()}>
               Search
             </Button>
           </Form.Item>
         </Form>
+      </Card>
+      <Card>
+        <h1>By words</h1>
+        <Form
+          labelAlign={'left'}
+          name="basic"
+          labelCol={{
+            span: 2
+          }}
+          wrapperCol={{
+            span: 3
+          }}
+          autoComplete="off">
+          <Form.Item label={'content'}>
+            <input {...register('content')} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={() => onContentSubmit()}>
+              Search
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <Card>
         {Object.keys(result).length > 0 && (
           <table>
             <tr>

@@ -1,10 +1,20 @@
 import { uuid } from 'uuidv4';
 import { Word } from '../models';
 import { execute } from './common';
+import { groupMetadata } from './metadata';
 
-const queryWord = async (word: string) => {
+export const queryWord = async (word: string) => {
   const data = await execute(`SELECT * FROM words WHERE word = '${word}'`);
   return data[0][0] as Word;
+};
+
+export const queryMetadataOfWords = async (word: string) => {
+  const data = await execute(`select metadata.* from words join wordsToDocuments
+on words.id = wordsToDocuments.wordId and words.word = '${word}'
+join metadata
+on wordsToDocuments.documentId = metadata.documentId`);
+  // @ts-ignore
+  return groupMetadata(data[0]);
 };
 
 export const saveWordsOfDocument = async (lines: string[][], documentId: string) => {
