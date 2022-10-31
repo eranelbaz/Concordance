@@ -13,7 +13,7 @@ INSERT INTO metadata (id, name, value, documentId) VALUES
 `
   );
 
-export const getMetadataByDocumentId = async (document: Partial<DocumentMetadata>) => {
+export const getMetadata = async (document: Partial<DocumentMetadata>) => {
   let sql = 'SELECT * FROM metadata WHERE ';
   const wheres: string[] = [];
   if (document.author) {
@@ -29,10 +29,19 @@ export const getMetadataByDocumentId = async (document: Partial<DocumentMetadata
     wheres.push(`name = 'year' and value = '${document.year}'`);
   }
   sql = sql.concat(wheres.join(' AND '));
-  const [yearData] = (await execute(sql)) as [Metadata[], any];
+  const [specificMetadataData] = (await execute(sql)) as [Metadata[], any];
   const data = (
-    await Promise.all(yearData.map(d => execute(`SELECT * from metadata where documentId = '${d.documentId}'`)))
+    await Promise.all(
+      specificMetadataData.map(d => execute(`SELECT * from metadata where documentId = '${d.documentId}'`))
+    )
   ).map(([data]) => data) as Metadata[][];
+
+  return groupMetadata(data.flat());
+};
+
+export const getMetadataByDocumentId = async (ids: string[]) => {
+  const sql = `SELECT * FROM metadata WHERE documentId in ("${ids.join('","')}")`;
+  const [data] = (await execute(sql)) as [Metadata[], any];
 
   return groupMetadata(data.flat());
 };

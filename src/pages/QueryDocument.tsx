@@ -5,13 +5,12 @@ import _ from 'lodash';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { WordToDocument } from '../be/db/models';
-
+type FixedMetadata = { author: string; album: string; title: string; year: string; id: string };
 const QueryDocument: React.FC = () => {
   const { register, getValues } = useForm();
-  const [result, setResult] = useState<
-    Record<string, { author: string; album: string; title: string; year: string; id: string }>
-  >({});
+  const [metadataSearchResults, setMetadataSearchResults] = useState<Record<string, FixedMetadata>>({});
   const [wordsResults, setWordsResults] = useState<Record<string, WordToDocument[]>>({});
+  const [wordsMetadataResults, setWordsMetadataResults] = useState<Record<string, FixedMetadata>>({});
 
   const onMetadataSubmit = async () => {
     const formData = _.omitBy(getValues(), _.isNil);
@@ -19,14 +18,16 @@ const QueryDocument: React.FC = () => {
     const { data } = await post('/searchMetadata', formData);
 
     // @ts-ignore
-    setResult(Object.keys(data).map(key => ({ ...data[key], id: key })));
+    setMetadataSearchResults(Object.keys(data).map(key => ({ ...data[key], id: key })));
   };
   const onContentSubmit = async () => {
     const content = _.omitBy(getValues(), _.isNil)['content'].split(' ');
-    const { data } = await post('/searchContent', content);
+    const {
+      data: { words, metadata }
+    } = await post('/searchContent', content);
 
     // @ts-ignore
-    setResult(Object.keys(data).map(key => ({ ...data[key], id: key })));
+    setMetadataSearchResults(Object.keys(words).map(key => ({ ...words[key], id: key })));
   };
 
   const onSearch = async queryAll => {
@@ -37,6 +38,7 @@ const QueryDocument: React.FC = () => {
 
     ({ data } = await post('/getDocumentContent', { documentIds: queryAll ? [] : idsToQuery }));
 
+    setWordsResults(data);
     setWordsResults(data);
   };
 
@@ -96,7 +98,7 @@ const QueryDocument: React.FC = () => {
         </Form>
       </Card>
       <Card>
-        {Object.keys(result).length > 0 && (
+        {Object.keys(metadataSearchResults).length > 0 && (
           <table>
             <tr>
               <th>Query Words</th>
@@ -105,8 +107,8 @@ const QueryDocument: React.FC = () => {
               <th>Title</th>
               <th>Year</th>
             </tr>
-            {Object.keys(result).map(documentId => {
-              const documentData = result[documentId];
+            {Object.keys(metadataSearchResults).map(documentId => {
+              const documentData = metadataSearchResults[documentId];
               return (
                 <tr>
                   <td>
@@ -124,6 +126,29 @@ const QueryDocument: React.FC = () => {
         <button onClick={() => onSearch(false)}>Search words for selected</button>
         <button onClick={() => onSearch(true)}>Search words for all</button>
       </Card>
+
+      {Object.keys(wordsResults).map(documentId => {
+        const documentsWords = wordsResults[documentId];
+        const sortedWords = {};
+        documentsWords.forEach(word => {
+          const line = (sortedWords[word.lineIndex] || []) as WordToDocument[];
+          sortedWords[word.lineIndex] = [...line, word].sort((a, b) => a.wordIndex - b.wordIndex);
+        });
+        const linesWithWords = Object.values(sortedWords) as WordToDocument[][];
+        return (
+          <>
+            <h3>The words for {}</h3>
+            {linesWithWords.flatMap(line => {
+              return (
+                <>
+                  <span>{line.flatMap(wordInLine => wordInLine.word).join(' ')}</span>
+                  <br />
+                </>
+              );
+            })}
+          </>
+        );
+      })}
     </PageContainer>
   );
 };
