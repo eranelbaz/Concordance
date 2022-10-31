@@ -5,9 +5,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const AddDocument: React.FC = () => {
-  const { register, getValues } = useForm();
+  const { register, getValues, trigger } = useForm();
   const [result, setResult] = useState('');
   const onSubmit = async () => {
+    await trigger();
     const data = getValues();
     console.log(data);
     const response = await post('/load', data);

@@ -22,25 +22,25 @@ const QueryDocument: React.FC = () => {
   };
   const onContentSubmit = async () => {
     const content = _.omitBy(getValues(), _.isNil)['content'].split(' ');
-    const {
-      data: { words, metadata }
-    } = await post('/searchContent', content);
+    const { data } = await post('/searchContent', content);
 
     // @ts-ignore
-    setMetadataSearchResults(Object.keys(words).map(key => ({ ...words[key], id: key })));
+    setMetadataSearchResults(Object.keys(data).map(key => ({ ...data[key], id: key })));
   };
 
   const onSearch = async queryAll => {
-    let data;
     const idsToQuery = Array.from(document.querySelectorAll('.queryThisDocument'))
       .filter(element => element.checked)
       .map(element => element.getAttribute('data-id'));
 
-    ({ data } = await post('/getDocumentContent', { documentIds: queryAll ? [] : idsToQuery }));
+    const {
+      data: { words, metadata }
+    } = await post('/getDocumentContent', { documentIds: queryAll ? [] : idsToQuery });
 
-    setWordsResults(data);
-    setWordsResults(data);
+    setWordsResults(words);
+    setWordsMetadataResults(metadata);
   };
+  console.log(wordsMetadataResults);
 
   return (
     <PageContainer content={'Query Document'}>
@@ -137,7 +137,10 @@ const QueryDocument: React.FC = () => {
         const linesWithWords = Object.values(sortedWords) as WordToDocument[][];
         return (
           <>
-            <h3>The words for {}</h3>
+            <h3>
+              The words for {wordsMetadataResults[documentId].author}, {wordsMetadataResults[documentId].album},{' '}
+              {wordsMetadataResults[documentId].title}, {wordsMetadataResults[documentId].year}
+            </h3>
             {linesWithWords.flatMap(line => {
               return (
                 <>
