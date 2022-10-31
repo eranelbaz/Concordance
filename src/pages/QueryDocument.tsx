@@ -4,12 +4,15 @@ import { Button, Card, Form } from 'antd';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { WordToDocument } from '../be/db/models';
 
-const AddDocument: React.FC = () => {
+const QueryDocument: React.FC = () => {
   const { register, getValues } = useForm();
-  const [result, setResult] = useState<{ author: string; album: string; title: string; year: string; id: string }[]>(
-    []
-  );
+  const [result, setResult] = useState<
+    Record<string, { author: string; album: string; title: string; year: string; id: string }>
+  >({});
+  const [wordsResults, setWordsResults] = useState<Record<string, WordToDocument[]>>({});
+
   const onMetadataSubmit = async () => {
     const formData = _.omitBy(getValues(), _.isNil);
 
@@ -25,6 +28,18 @@ const AddDocument: React.FC = () => {
     // @ts-ignore
     setResult(Object.keys(data).map(key => ({ ...data[key], id: key })));
   };
+
+  const onSearch = async queryAll => {
+    let data;
+    const idsToQuery = Array.from(document.querySelectorAll('.queryThisDocument'))
+      .filter(element => element.checked)
+      .map(element => element.getAttribute('data-id'));
+
+    ({ data } = await post('/getDocumentContent', { documentIds: queryAll ? [] : idsToQuery }));
+
+    setWordsResults(data);
+  };
+
   return (
     <PageContainer content={'Query Document'}>
       <Card>
@@ -84,6 +99,7 @@ const AddDocument: React.FC = () => {
         {Object.keys(result).length > 0 && (
           <table>
             <tr>
+              <th>Query Words</th>
               <th>Author</th>
               <th>Album</th>
               <th>Title</th>
@@ -93,6 +109,9 @@ const AddDocument: React.FC = () => {
               const documentData = result[documentId];
               return (
                 <tr>
+                  <td>
+                    <input type={'checkbox'} data-id={documentData.id} className={'queryThisDocument'} />
+                  </td>
                   <td>{documentData.author}</td>
                   <td>{documentData.album}</td>
                   <td>{documentData.title}</td>
@@ -102,9 +121,11 @@ const AddDocument: React.FC = () => {
             })}
           </table>
         )}
+        <button onClick={() => onSearch(false)}>Search words for selected</button>
+        <button onClick={() => onSearch(true)}>Search words for all</button>
       </Card>
     </PageContainer>
   );
 };
 
-export default AddDocument;
+export default QueryDocument;

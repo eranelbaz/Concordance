@@ -1,5 +1,5 @@
 import { uuid } from 'uuidv4';
-import { Word } from '../models';
+import { Word, WordToDocument } from '../models';
 import { execute } from './common';
 import { groupMetadata } from './metadata';
 
@@ -15,6 +15,22 @@ join metadata
 on wordsToDocuments.documentId = metadata.documentId`);
   // @ts-ignore
   return groupMetadata(data[0]);
+};
+
+export const getDocumentWords = async (documentIds: string[]) => {
+  const [data] = (await execute(`select * from words join wordsToDocuments
+on wordsToDocuments.wordId = words.id
+${documentIds.length > 0 ? ` and wordsToDocuments.documentId in ("${documentIds.join('","')}")` : ``}`)) as unknown as [
+    WordToDocument[]
+  ];
+  const wordsByDocumentIds = {};
+  data.forEach(row => {
+    const words = (wordsByDocumentIds[row.documentId] || []) as WordToDocument[];
+    words.push(row);
+    wordsByDocumentIds[row.documentId] = words;
+  });
+
+  return wordsByDocumentIds;
 };
 
 export const saveWordsOfDocument = async (lines: string[][], documentId: string) => {
