@@ -5,15 +5,23 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const AddDocument: React.FC = () => {
-  const { register, getValues, trigger } = useForm();
+  const {
+    register,
+    getValues,
+    formState: { isValid },
+    trigger
+  } = useForm();
   const [result, setResult] = useState('');
   const onSubmit = async () => {
     await trigger();
-    const data = getValues();
-    console.log(data);
-    const response = await post('/load', data);
-    setResult(response.data);
+    if (isValid) {
+      const data = getValues();
+      console.log(data);
+      const response = await post('/load', data);
+      setResult(response.data);
+    }
   };
+  console.log('isValid', isValid);
   return (
     <PageContainer content={'Add Document'}>
       <Card>
@@ -47,7 +55,7 @@ const AddDocument: React.FC = () => {
               Submit
             </Button>
           </Form.Item>
-          <label>{result}</label>
+          <label>{isValid ? result : 'form isnt valid'}</label>
         </Form>
       </Card>
     </PageContainer>

@@ -40,7 +40,7 @@ export const getMetadata = async (document: Partial<DocumentMetadata>) => {
 };
 
 export const getMetadataByDocumentId = async (ids: string[]) => {
-  const sql = `SELECT * FROM metadata WHERE documentId in ("${ids.join('","')}")`;
+  const sql = `SELECT * FROM metadata ${ids.length > 0 ? `where documentId in ("${ids.join('","')}")` : ''}`;
   const [data] = (await execute(sql)) as [Metadata[], any];
 
   return groupMetadata(data.flat());
