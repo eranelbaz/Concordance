@@ -6,10 +6,12 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { WordToDocument } from '../be/db/models';
 type FixedMetadata = { author: string; album: string; title: string; year: string; id: string };
+type WordsInDocument = Pick<WordToDocument, 'word' | 'wordId' | 'documentId'>;
+
 const QueryDocument: React.FC = () => {
   const { register, getValues } = useForm();
   const [metadataSearchResults, setMetadataSearchResults] = useState<Record<string, FixedMetadata>>({});
-  const [wordsResults, setWordsResults] = useState<Record<string, WordToDocument[]>>({});
+  const [wordsResults, setWordsResults] = useState<Record<string, WordsInDocument[]>>({});
   const [wordsMetadataResults, setWordsMetadataResults] = useState<Record<string, FixedMetadata>>({});
 
   const onMetadataSubmit = async () => {
@@ -28,14 +30,13 @@ const QueryDocument: React.FC = () => {
     setMetadataSearchResults(Object.keys(data).map(key => ({ ...data[key], id: key })));
   };
 
-  const onSearch = async queryAll => {
+  const onWordsSearch = async queryAll => {
     const idsToQuery = Array.from(document.querySelectorAll('.queryThisDocument'))
       .filter(element => element.checked)
       .map(element => element.getAttribute('data-id'));
 
-    const {
-      data: { words, metadata }
-    } = await post('/getDocumentContent', { documentIds: queryAll ? [] : idsToQuery });
+    const { data: words } = await post('/getDocumentWords', { documentIds: queryAll ? [] : idsToQuery });
+    const { data: metadata } = await post('/getDocumentsMetadata', { documentIds: queryAll ? [] : idsToQuery });
 
     setWordsResults(words);
     setWordsMetadataResults(metadata);
@@ -123,37 +124,64 @@ const QueryDocument: React.FC = () => {
             })}
           </table>
         )}
-        <button onClick={() => onSearch(false)}>Search words for selected</button>
-        <button onClick={() => onSearch(true)}>Search words for all</button>
-      </Card>
+        <button onClick={() => onWordsSearch(false)}>Search words for selected</button>
+        <button onClick={() => onWordsSearch(true)}>Search words for all</button>
 
-      {Object.keys(wordsResults).map(documentId => {
-        const documentsWords = wordsResults[documentId];
-        const sortedWords = {};
-        documentsWords.forEach(word => {
-          const line = (sortedWords[word.lineIndex] || []) as WordToDocument[];
-          sortedWords[word.lineIndex] = [...line, word].sort((a, b) => a.wordIndex - b.wordIndex);
-        });
-        const linesWithWords = Object.values(sortedWords) as WordToDocument[][];
-        return (
-          <>
-            <h3>
-              The words for {wordsMetadataResults[documentId].author}, {wordsMetadataResults[documentId].album},{' '}
-              {wordsMetadataResults[documentId].title}, {wordsMetadataResults[documentId].year}
-            </h3>
-            {linesWithWords.flatMap(line => {
-              return (
-                <>
-                  <span>{line.flatMap(wordInLine => wordInLine.word).join(' ')}</span>
-                  <br />
-                </>
-              );
-            })}
-          </>
-        );
-      })}
+        {Object.keys(wordsResults).map(documentId => {
+          console.log('doc id', documentId);
+          console.log('wordsMetadataResults', wordsMetadataResults);
+          const documentsWords = wordsResults[documentId];
+          return (
+            <>
+              <h3>
+                {wordsMetadataResults[documentId] != undefined && (
+                  <>
+                    The words for {wordsMetadataResults[documentId]?.author}, {wordsMetadataResults[documentId]?.album},
+                    {wordsMetadataResults[documentId]?.title}, {wordsMetadataResults[documentId]?.year}
+                  </>
+                )}
+              </h3>
+              {documentsWords.map(word => {
+                return (
+                  <>
+                    <a href={`words/${word.documentId}/${word.wordId}`}>{word.word} </a>
+                    <br />
+                  </>
+                );
+              })}
+            </>
+          );
+        })}
+      </Card>
     </PageContainer>
   );
 };
 
 export default QueryDocument;
+
+// Print document content by order
+//{/*{Object.keys(wordsResults).map(documentId => {*/}
+//       {/*  const documentsWords = wordsResults[documentId];*/}
+//       {/*  const sortedWords = {};*/}
+//       {/*  documentsWords.forEach(word => {*/}
+//       {/*    const line = (sortedWords[word.lineIndex] || []) as WordToDocument[];*/}
+//       {/*    sortedWords[word.lineIndex] = [...line, word].sort((a, b) => a.wordIndex - b.wordIndex);*/}
+//       {/*  });*/}
+//       {/*  const linesWithWords = Object.values(sortedWords) as WordToDocument[][];*/}
+//       {/*  return (*/}
+//       {/*    <>*/}
+//       {/*      <h3>*/}
+//       {/*        The words for {wordsMetadataResults[documentId].author}, {wordsMetadataResults[documentId].album},{' '}*/}
+//       {/*        {wordsMetadataResults[documentId].title}, {wordsMetadataResults[documentId].year}*/}
+//       {/*      </h3>*/}
+//       {/*      {linesWithWords.flatMap(line => {*/}
+//       {/*        return (*/}
+//       {/*          <>*/}
+//       {/*            <span>{line.flatMap(wordInLine => wordInLine.word).join(' ')}</span>*/}
+//       {/*            <br />*/}
+//       {/*          </>*/}
+//       {/*        );*/}
+//       {/*      })}*/}
+//       {/*    </>*/}
+//       {/*  );*/}
+//       {/*})}*/}

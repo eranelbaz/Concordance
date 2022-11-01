@@ -29,8 +29,7 @@ CREATE TABLE `wordsToDocuments` (
   `wordIndex` int,
   `documentId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
-  FOREIGN KEY (documentId) REFERENCES `documents`(id),
-  UNIQUE (wordId,documentId)
+  FOREIGN KEY (documentId) REFERENCES `documents`(id)
 );
 
 CREATE TABLE `groups` (

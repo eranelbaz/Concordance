@@ -11,7 +11,15 @@ export const loadDocument = async (document: InputDocument) => {
     console.log(`Loading`, { document });
     const songId = await saveDocument(document);
 
-    const lines = document.content.split('\n');
+    const lines = document.content
+      .toLowerCase()
+      .replace(',', '')
+      .replace('?', '')
+      .replace('!', '')
+      .replace("'", "''")
+      .replace('(', '')
+      .replace(')', '')
+      .split('\n');
     const words = lines.map(line => line.split(' '));
     await saveWordsOfDocument(words, songId);
     return 'load';

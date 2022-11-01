@@ -2,6 +2,7 @@ import { uuid } from 'uuidv4';
 import { DocumentMetadata, InputDocument } from '../../api';
 import { Metadata } from '../models';
 import { execute } from './common';
+
 export const storeMetadata = async (documentId: string, { album, year, title, author }: InputDocument) =>
   execute(
     `
@@ -42,7 +43,6 @@ export const getMetadata = async (document: Partial<DocumentMetadata>) => {
 export const getMetadataByDocumentId = async (ids: string[]) => {
   const sql = `SELECT * FROM metadata ${ids.length > 0 ? `where documentId in ("${ids.join('","')}")` : ''}`;
   const [data] = (await execute(sql)) as [Metadata[], any];
-
   return groupMetadata(data.flat());
 };
 

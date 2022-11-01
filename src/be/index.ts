@@ -30,7 +30,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import { getMetadata, getMetadataByDocumentId } from './db/stores/metadata';
-import { getDocumentWords, queryMetadataOfWords } from './db/stores/words';
+import { getDocumentContent, getDocumentWords, getWord, queryMetadataOfWords } from './db/stores/words';
 import { loadDocument } from './load-document';
 
 const app = express();
@@ -63,12 +63,39 @@ app.post('/searchContent', async (req, res) => {
   res.json(wordsIds);
 });
 app.post('/getDocumentContent', async (req, res) => {
+  const documentId = req.body.documentId;
+  console.log('getting words for document', { documentId });
+
+  const words = await getDocumentContent(documentId);
+  res.json(words);
+});
+app.post('/getDocumentWords', async (req, res) => {
   const documentIds = req.body.documentIds;
-  console.log('getting words for documents', { documentIds });
+  console.log('getting distinct words for documents', { documentIds });
 
   const words = await getDocumentWords(documentIds);
+  res.json(words);
+});
+
+app.post('/getDocumentMetadata', async (req, res) => {
+  const documentId = req.body.documentId;
+
+  const metadata = await getMetadataByDocumentId([documentId]);
+  res.json(metadata);
+});
+app.post('/getDocumentsMetadata', async (req, res) => {
+  const documentIds = req.body.documentIds;
+
   const metadata = await getMetadataByDocumentId(documentIds);
-  res.json({ words, metadata });
+  res.json(metadata);
+});
+
+app.post('/getWord', async (req, res) => {
+  const wordId = req.body.wordId;
+  console.log('getting word data', { wordId });
+
+  const word = await getWord(wordId);
+  res.json(word);
 });
 
 app.listen(port, () => {
