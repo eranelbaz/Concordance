@@ -12,6 +12,8 @@ const DocumentWords: React.FC = () => {
   const [word, setWord] = useState<Word>();
   const [documentMetadata, setDocumentMetadata] = useState<FixedMetadata>();
   const [documentContent, setDocumentContent] = useState<WordToDocument[]>();
+  const [showContent, setShowContent] = useState(false);
+
   const wordId = document.URL.split('/').reverse()[0];
   const documentId = document.URL.split('/').reverse()[1];
   useAsyncEffect(async () => {
@@ -30,7 +32,6 @@ const DocumentWords: React.FC = () => {
     .groupBy('lineIndex')
     .value();
   const documentContentByLines = _(documentContent).groupBy('lineIndex').value();
-  console.log(documentContentByLines);
   return word && documentMetadata ? (
     <PageContainer content={'Query Document'}>
       <Card>
@@ -39,6 +40,15 @@ const DocumentWords: React.FC = () => {
           {documentMetadata[documentId]?.album},{documentMetadata[documentId]?.title},
           {documentMetadata[documentId]?.year}
         </h1>
+        <button onClick={() => setShowContent(!showContent)}>Toggle all text</button>
+        <br />
+        {showContent &&
+          Object.keys(documentContentByLines).map(lineNumber => (
+            <>
+              {documentContentByLines[lineNumber]?.map(word => word.word).join(' ')}
+              <br />
+            </>
+          ))}
         {Object.keys(relevantLines).map(lineNumber => {
           return (
             <DocumentLineContext lineNumber={parseInt(lineNumber)} documentContentByLines={documentContentByLines} />
