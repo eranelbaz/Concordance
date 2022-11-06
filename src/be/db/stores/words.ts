@@ -32,12 +32,11 @@ export const getWord = async (wordId: string) => {
 };
 
 export const getDocumentWords = async (documentIds: string[]) => {
-  const [data] =
-    (await execute(`select distinct words.word, wordsToDocuments.wordId, wordsToDocuments.documentId from words join wordsToDocuments
+  const [data] = (await execute(`select * from words join wordsToDocuments
 on wordsToDocuments.wordId = words.id
 ${documentIds.length > 0 ? ` and wordsToDocuments.documentId in ("${documentIds.join('","')}")` : ``}`)) as unknown as [
-      WordToDocument[]
-    ];
+    WordToDocument[]
+  ];
   const wordsByDocumentIds = {};
   data.forEach(row => {
     const words = (wordsByDocumentIds[row.documentId] || []) as WordToDocument[];

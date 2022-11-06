@@ -1,3 +1,4 @@
+import { DocumentLineContext } from '@/components/WordIndexes';
 import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Card, Form } from 'antd';
@@ -6,12 +7,12 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { WordToDocument } from '../be/db/models';
 type FixedMetadata = { author: string; album: string; title: string; year: string; id: string };
-type WordsInDocument = Pick<WordToDocument, 'word' | 'wordId' | 'documentId'>;
 
 const QueryDocument: React.FC = () => {
   const { register, getValues } = useForm();
   const [metadataSearchResults, setMetadataSearchResults] = useState<Record<string, FixedMetadata>>({});
-  const [wordsResults, setWordsResults] = useState<Record<string, WordsInDocument[]>>({});
+  const [wordsResults, setWordsResults] = useState<Record<string, WordToDocument[]>>({});
+  const [showIndex, setShowIndex] = useState(false);
   const [wordsMetadataResults, setWordsMetadataResults] = useState<Record<string, FixedMetadata>>({});
 
   const onMetadataSubmit = async () => {
@@ -125,12 +126,13 @@ const QueryDocument: React.FC = () => {
           </table>
         )}
         <button onClick={() => onWordsSearch(false)}>Search words for selected</button>
-        <button onClick={() => onWordsSearch(true)}>Search words for all</button>
-
+        <button onClick={() => onWordsSearch(true)}>Search words for all</button> <br />
+        <label>
+          <input type={'checkbox'} onChange={() => setShowIndex(!showIndex)} />
+          Show index
+        </label>
         {Object.keys(wordsResults).map(documentId => {
-          console.log('doc id', documentId);
-          console.log('wordsMetadataResults', wordsMetadataResults);
-          const documentsWords = wordsResults[documentId];
+          const documentsWords = _.uniqBy(wordsResults[documentId], 'wordId');
           return (
             <>
               <h3>
@@ -145,6 +147,7 @@ const QueryDocument: React.FC = () => {
                 return (
                   <>
                     <a href={`words/${word.documentId}/${word.wordId}`}>{word.word} </a>
+                    {showIndex && <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />}
                     <br />
                   </>
                 );
@@ -158,30 +161,3 @@ const QueryDocument: React.FC = () => {
 };
 
 export default QueryDocument;
-
-// Print document content by order
-//{/*{Object.keys(wordsResults).map(documentId => {*/}
-//       {/*  const documentsWords = wordsResults[documentId];*/}
-//       {/*  const sortedWords = {};*/}
-//       {/*  documentsWords.forEach(word => {*/}
-//       {/*    const line = (sortedWords[word.lineIndex] || []) as WordToDocument[];*/}
-//       {/*    sortedWords[word.lineIndex] = [...line, word].sort((a, b) => a.wordIndex - b.wordIndex);*/}
-//       {/*  });*/}
-//       {/*  const linesWithWords = Object.values(sortedWords) as WordToDocument[][];*/}
-//       {/*  return (*/}
-//       {/*    <>*/}
-//       {/*      <h3>*/}
-//       {/*        The words for {wordsMetadataResults[documentId].author}, {wordsMetadataResults[documentId].album},{' '}*/}
-//       {/*        {wordsMetadataResults[documentId].title}, {wordsMetadataResults[documentId].year}*/}
-//       {/*      </h3>*/}
-//       {/*      {linesWithWords.flatMap(line => {*/}
-//       {/*        return (*/}
-//       {/*          <>*/}
-//       {/*            <span>{line.flatMap(wordInLine => wordInLine.word).join(' ')}</span>*/}
-//       {/*            <br />*/}
-//       {/*          </>*/}
-//       {/*        );*/}
-//       {/*      })}*/}
-//       {/*    </>*/}
-//       {/*  );*/}
-//       {/*})}*/}
