@@ -7,14 +7,13 @@ type Props = {
 };
 export const DocumentLineContext: React.FC<Props> = ({ wordId, documentWords }) => {
   const wordInstances = useMemo(() => documentWords.filter(({ wordId: id }) => id === wordId), [documentWords, wordId]);
-  console.log({ documentWords, wordInstances });
   return (
     <div>
       {wordInstances.map(({ lineIndex, wordIndex, paragraphLineIndex, paragraphIndex }) => {
         return (
           <>
             line,word - {lineIndex},{wordIndex} <br />
-            paragraph,line in paragraph - {paragraphLineIndex},{paragraphLineIndex}
+            paragraph,line in paragraph - {paragraphIndex},{paragraphLineIndex}
             <br />
             <br />
           </>
