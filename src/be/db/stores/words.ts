@@ -19,7 +19,7 @@ on wordsToDocuments.documentId = metadata.documentId`);
 
 export const getDocumentContent = async (documentId: string) => {
   const [data] = (await execute(`select * from words join wordsToDocuments
-on wordsToDocuments.wordId = words.id and wordsToDocuments.documentId ="${documentId}" order by lineIndex,wordIndex`)) as unknown as [
+on wordsToDocuments.wordId = words.id and wordsToDocuments.documentId ="${documentId}" order by paragraphIndex,lineIndex,wordIndex`)) as unknown as [
     WordToDocument[]
   ];
 
@@ -48,7 +48,7 @@ ${documentIds.length > 0 ? ` and wordsToDocuments.documentId in ("${documentIds.
   return wordsByDocumentIds;
 };
 
-export const saveWordsOfDocument = async (lines: string[][], documentId: string) => {
+export const saveWordsOfDocument = async (words: string[][][], documentId: string) => {
   const runSerial = tasks => {
     var result = Promise.resolve();
     tasks.forEach(task => {
@@ -56,31 +56,54 @@ export const saveWordsOfDocument = async (lines: string[][], documentId: string)
     });
     return result;
   };
-  const insertWord = async (word: string, wordIndex: number, lineIndex: number) => {
+  const insertWord = async (word: string, index: { paragraph; word; line; lineParagraph }) => {
     const wordDBData = await queryWord(word);
     const isWordExists = !!wordDBData;
     console.log(`the word ${word} exists = ${isWordExists}`);
     const wordMetadata = {
       id: isWordExists ? wordDBData.id : uuid(),
-      lineIndex,
-      wordIndex,
+      lineIndex: index.line,
+      wordIndex: index.word,
+      paragraphIndex: index.paragraph,
+      paragraphLineIndex: index.lineParagraph,
       word
     };
     if (!isWordExists) {
       await execute(`INSERT INTO words (id, word) VALUES ('${wordMetadata.id}', '${wordMetadata.word}');`);
     }
-    await execute(`INSERT INTO wordsToDocuments (id, lineIndex, wordIndex, wordId, documentId) VALUES
-                    ('${uuid()}', ${lineIndex}, ${wordIndex}, '${wordMetadata.id}', '${documentId}');`);
+    await execute(`INSERT INTO wordsToDocuments (id,paragraphIndex,paragraphLineIndex, lineIndex, wordIndex, wordId, documentId) VALUES
+                    ('${uuid()}',${wordMetadata.paragraphIndex},${wordMetadata.paragraphLineIndex}, ${
+      wordMetadata.lineIndex
+    }, ${wordMetadata.wordIndex}, '${wordMetadata.id}', '${documentId}');`);
   };
 
-  const dataToInsert = lines.flatMap((line, lineIndex) =>
-    line.flatMap((word, wordIndex) => ({ word, wordIndex, lineIndex }))
-  );
+  let wordIndex = 0;
+  let lineIndex = 0;
+  let paraLineIndex = 0;
+  let paragraphIndex = 0;
+
+  const dataToInsert = words.flatMap(lines => {
+    paraLineIndex = 0;
+    const ret = lines.flatMap(words => {
+      wordIndex = 0;
+      const ret = words.flatMap(word => {
+        const ret = { word, wordIndex, lineIndex, paraLineIndex, paragraphIndex };
+        wordIndex += 1;
+
+        return ret;
+      });
+      lineIndex += 1;
+      paraLineIndex += 1;
+      return ret;
+    });
+    paragraphIndex += 1;
+    return ret;
+  });
 
   const tasks = dataToInsert.map(
-    ({ word, wordIndex, lineIndex }) =>
+    ({ word, wordIndex, lineIndex, paragraphIndex, paraLineIndex }) =>
       () =>
-        insertWord(word, wordIndex, lineIndex)
+        insertWord(word, { paragraph: paragraphIndex, word: wordIndex, line: lineIndex, lineParagraph: paraLineIndex })
   );
 
   await runSerial(tasks);

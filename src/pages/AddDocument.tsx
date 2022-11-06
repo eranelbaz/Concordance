@@ -12,16 +12,17 @@ const AddDocument: React.FC = () => {
     trigger
   } = useForm();
   const [result, setResult] = useState('');
+
   const onSubmit = async () => {
-    await trigger();
     if (isValid) {
       const data = getValues();
-      console.log(data);
+
+      setResult('loading');
+
       const response = await post('/load', data);
       setResult(response.data);
     }
   };
-  console.log('isValid', isValid);
   return (
     <PageContainer content={'Add Document'}>
       <Card>
@@ -36,19 +37,24 @@ const AddDocument: React.FC = () => {
           }}
           autoComplete="off">
           <Form.Item label={'author'}>
-            <input {...register('author', { required: true })} />
+            <input onChange={() => trigger()} {...register('author', { required: true })} />
           </Form.Item>
           <Form.Item label={'title'}>
-            <input {...register('title', { required: true })} />
+            <input onChange={() => trigger()} {...register('title', { required: true })} />
           </Form.Item>
           <Form.Item label={'album'}>
-            <input {...register('album', { required: true })} />
+            <input onChange={() => trigger()} {...register('album', { required: true })} />
           </Form.Item>
           <Form.Item label={'year'}>
-            <input type={'number'} {...register('year', { required: true })} />
+            <input onInput={() => trigger()} type={'number'} {...register('year', { required: true })} />
           </Form.Item>
           <Form.Item label={'content'}>
-            <textarea {...register('content', { required: true })} rows={10} />
+            <textarea
+              onChange={() => trigger()}
+              style={{ resize: 'both' }}
+              {...register('content', { required: true })}
+              rows={10}
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" onClick={() => onSubmit()}>
