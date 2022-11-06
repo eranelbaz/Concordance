@@ -108,30 +108,6 @@ const Welcome: React.FC = () => {
             }}>
             Concordance
           </p>
-          <div
-            style={{
-              display: 'flex',
-              gap: 16
-            }}>
-            <InfoCard
-              index={1}
-              href="https://umijs.org/docs/introduce/introduce"
-              title="paying to freemium"
-              desc="paying to freemium"
-            />
-            <InfoCard
-              index={2}
-              title="Get deployment logs"
-              href="https://ant.design"
-              desc="get deployment logs by deploymentlog id"
-            />
-            <InfoCard
-              index={3}
-              title="Cancel deployment"
-              href="https://procomponents.ant.design"
-              desc="free stuck deployment"
-            />
-          </div>
         </div>
       </Card>
     </PageContainer>
