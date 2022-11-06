@@ -7,5 +7,6 @@ export type WordToDocument = {
   wordId: string;
   lineIndex: number;
   wordIndex: number;
+  paragraphIndex: number;
   documentId: string;
 };

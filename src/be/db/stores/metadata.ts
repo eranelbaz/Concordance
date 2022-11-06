@@ -7,10 +7,10 @@ export const storeMetadata = async (documentId: string, { album, year, title, au
   execute(
     `
 INSERT INTO metadata (id, name, value, documentId) VALUES
-                ('${uuid()}', 'album', '${album}', '${documentId}'),
-                ('${uuid()}', 'year', '${year}',   '${documentId}'),
-                ('${uuid()}', 'title', '${title}', '${documentId}'),
-                ('${uuid()}', 'author', '${author}','${documentId}');
+                ('${uuid()}', 'album', '${album.toLowerCase()}', '${documentId}'),
+                ('${uuid()}', 'year', '${year.toLowerCase()}',   '${documentId}'),
+                ('${uuid()}', 'title', '${title.toLowerCase()}', '${documentId}'),
+                ('${uuid()}', 'author', '${author.toLowerCase()}','${documentId}');
 `
   );
 

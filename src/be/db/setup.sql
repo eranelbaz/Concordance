@@ -25,6 +25,7 @@ CREATE TABLE `words` (
 CREATE TABLE `wordsToDocuments` (
   `id` varchar(36) PRIMARY KEY,
   `wordId` varchar(36),
+  `paragraphIndex` int,
   `lineIndex` int,
   `wordIndex` int,
   `documentId` varchar(36),

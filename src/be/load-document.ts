@@ -11,17 +11,21 @@ export const loadDocument = async (document: InputDocument) => {
     console.log(`Loading`, { document });
     const songId = await saveDocument(document);
 
-    const lines = document.content
+    const canonizeContent = document.content
       .toLowerCase()
-      .replace(',', '')
-      .replace('?', '')
-      .replace('!', '')
-      .replace("'", "''")
-      .replace('(', '')
-      .replace(')', '')
-      .split('\n');
-    const words = lines.map(line => line.split(' '));
-    await saveWordsOfDocument(words, songId);
+      .replaceAll(`'`, '')
+      .replaceAll(`"`, '')
+      .replaceAll(`.`, '')
+      .replaceAll(',', '')
+      .replaceAll('?', '')
+      .replaceAll('!', '')
+      .replaceAll("'", "''")
+      .replaceAll('(', '')
+      .replaceAll('-', ' ')
+      .replaceAll(')', '');
+    const splits = canonizeContent.split('\n\n').map(lines => lines.split('\n').map(line => line.split(' ')));
+
+    await saveWordsOfDocument(splits, songId);
     return 'load';
   }
 };
