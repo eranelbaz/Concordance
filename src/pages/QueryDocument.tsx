@@ -1,3 +1,4 @@
+import { SearchByIndex } from '@/components/SearchByIndex';
 import { DocumentLineContext } from '@/components/WordIndexes';
 import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
@@ -14,6 +15,7 @@ const QueryDocument: React.FC = () => {
   const [wordsResults, setWordsResults] = useState<Record<string, WordToDocument[]>>({});
   const [showIndex, setShowIndex] = useState(false);
   const [wordsMetadataResults, setWordsMetadataResults] = useState<Record<string, FixedMetadata>>({});
+  const [byIndex, setByIndex] = useState(false);
 
   const onMetadataSubmit = async () => {
     const formData = _.omitBy(getValues(), _.isNil);
@@ -42,7 +44,8 @@ const QueryDocument: React.FC = () => {
     setWordsResults(words);
     setWordsMetadataResults(metadata);
   };
-  console.log(wordsMetadataResults);
+
+  const onWordIndexSearch = async () => {};
 
   return (
     <PageContainer content={'Query Document'}>
@@ -125,8 +128,14 @@ const QueryDocument: React.FC = () => {
             })}
           </table>
         )}
+      </Card>
+      <Card>
         <button onClick={() => onWordsSearch(false)}>Search words for selected</button>
         <button onClick={() => onWordsSearch(true)}>Search words for all</button> <br />
+        <button onClick={() => setByIndex(!byIndex)}>Search words by index for selected</button> <br />
+        {byIndex && <SearchByIndex />}
+      </Card>
+      <Card>
         <label>
           <input type={'checkbox'} onChange={() => setShowIndex(!showIndex)} />
           Show index

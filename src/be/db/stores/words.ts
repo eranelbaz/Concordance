@@ -76,15 +76,15 @@ export const saveWordsOfDocument = async (words: string[][][], documentId: strin
     }, ${wordMetadata.wordIndex}, '${wordMetadata.id}', '${documentId}');`);
   };
 
-  let wordIndex = 0;
-  let lineIndex = 0;
-  let paraLineIndex = 0;
-  let paragraphIndex = 0;
+  let wordIndex = 1;
+  let lineIndex = 1;
+  let paraLineIndex = 1;
+  let paragraphIndex = 1;
 
   const dataToInsert = words.flatMap(lines => {
-    paraLineIndex = 0;
+    paraLineIndex = 1;
     const ret = lines.flatMap(words => {
-      wordIndex = 0;
+      wordIndex = 1;
       const ret = words.flatMap(word => {
         const ret = { word, wordIndex, lineIndex, paraLineIndex, paragraphIndex };
         wordIndex += 1;
