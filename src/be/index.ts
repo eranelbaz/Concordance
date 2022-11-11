@@ -29,6 +29,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
+import { createGroup, getGroups } from './db/stores/groups';
 import { getMetadata, getMetadataByDocumentId } from './db/stores/metadata';
 import { getDocumentContent, getDocumentWords, getWord, queryMetadataOfWords } from './db/stores/words';
 import { loadDocument } from './load-document';
@@ -96,6 +97,25 @@ app.post('/getWord', async (req, res) => {
 
   const word = await getWord(wordId);
   res.json(word);
+});
+
+app.post('/getWordGroups', async (req, res) => {
+  console.log('getting word groups');
+
+  const groups = await getGroups();
+  res.json(groups);
+});
+app.post('/createWordGroups', async (req, res) => {
+  const { name, words } = req.body;
+
+  console.log('creating word groups', { name, words });
+  try {
+    await createGroup(name, words);
+    res.send('success');
+  } catch (e) {
+    const error = e as Error;
+    res.send(error.message);
+  }
 });
 
 app.listen(port, () => {
