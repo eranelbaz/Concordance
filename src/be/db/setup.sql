@@ -32,6 +32,7 @@ CREATE TABLE `wordsToDocuments` (
   `documentId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (documentId) REFERENCES `documents`(id)
+  UNIQUE (wordId,documentId)
 );
 
 CREATE TABLE `groups` (
@@ -46,6 +47,7 @@ CREATE TABLE `groupsToWords` (
   `wordId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
+  UNIQUE (groupId, wordId)
 );
 
 CREATE USER 'concordance'@'localhost' IDENTIFIED WITH mysql_native_password BY 'concordance';
