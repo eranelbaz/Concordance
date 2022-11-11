@@ -10,7 +10,17 @@ export const getGroups = async () => {
   return groups;
 };
 
+export const queryGroupByName = async (name: string) => {
+  const data = await execute(`SELECT * FROM \`groups\` WHERE name = '${name}'`);
+  return data[0][0] as Group;
+};
+
 export const createGroup = async (name: string, words: string[]) => {
+  const groupDBData = await queryGroupByName(name);
+  const isGroupExists = !!groupDBData;
+  if (isGroupExists) {
+    throw new Error('group name exists');
+  }
   const wordsFromDB = await Promise.all(
     words.map(async word => {
       const wordDBData = await queryWord(word);
