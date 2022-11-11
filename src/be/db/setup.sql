@@ -37,6 +37,7 @@ CREATE TABLE `wordsToDocuments` (
 CREATE TABLE `groups` (
   `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL
+  UNIQUE (name)
 );
 
 CREATE TABLE `groupsToWords` (

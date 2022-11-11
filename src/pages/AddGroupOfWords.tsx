@@ -41,6 +41,7 @@ const AddDocument: React.FC = () => {
         </select>
       </Card>
       <Card>
+        <h1>Add group</h1>
         <Form
           labelAlign={'left'}
           name="basic"
@@ -56,6 +57,7 @@ const AddDocument: React.FC = () => {
           </Form.Item>
           <Form.Item label={'words'}>
             <textarea
+              placeholder={'split by line'}
               onInput={() => trigger()}
               style={{ resize: 'both' }}
               {...register('words', { required: true })}
