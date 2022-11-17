@@ -29,7 +29,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
-import { createGroup, getGroups, getWordsInGroups } from './db/stores/groups';
+import { createGroup, getGroups, getWordsInGroups, insertToGroup } from './db/stores/groups';
 import { getMetadata, getMetadataByDocumentId } from './db/stores/metadata';
 import { getDocumentContent, getDocumentWords, getWord, queryMetadataOfWords } from './db/stores/words';
 import { loadDocument } from './load-document';
@@ -105,12 +105,25 @@ app.post('/getWordGroups', async (req, res) => {
   const groups = await getGroups();
   res.json(groups);
 });
-app.post('/createWordGroups', async (req, res) => {
+app.post('/insertToGroupWords', async (req, res) => {
   const { name, words } = req.body;
 
-  console.log('creating word groups', { name, words });
+  console.log('inserting word groups', { name, words });
   try {
-    await createGroup(name, words);
+    await insertToGroup(name, words);
+    res.send('success');
+  } catch (e) {
+    const error = e as Error;
+    res.send(error.message);
+  }
+});
+
+app.post('/createWordGroups', async (req, res) => {
+  const { name, type } = req.body;
+
+  console.log('creating word groups', { name, type });
+  try {
+    await createGroup(name, type);
     res.send('success');
   } catch (e) {
     const error = e as Error;

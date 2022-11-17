@@ -1,8 +1,9 @@
 export type Document = { id: string; path: string };
 export type Word = { id: string; word: string };
 export type Metadata = { id: string; name: string; value: string; documentId: string };
-export type Group = { id: string; name: string };
-export type GroupToWords = { groupId: string; wordId: string; word: string };
+export type GroupTypes = 'regular' | 'phrase';
+export type Group = { id: string; name: string; type: GroupTypes };
+export type GroupToWords = { groupId: string; wordId: string; word: string; type: string };
 export type WordToDocument = {
   id: string;
   word: string;
