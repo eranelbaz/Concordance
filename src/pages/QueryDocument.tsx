@@ -147,15 +147,18 @@ const QueryDocument: React.FC = () => {
               <h3>
                 {wordsMetadataResults[documentId] != undefined && (
                   <>
-                    The words for {wordsMetadataResults[documentId]?.author}, {wordsMetadataResults[documentId]?.album},
-                    {wordsMetadataResults[documentId]?.title}, {wordsMetadataResults[documentId]?.year}
+                    The words for-
+                    <a href={`document/${documentId}`}>
+                      {wordsMetadataResults[documentId]?.author}, {wordsMetadataResults[documentId]?.album},
+                      {wordsMetadataResults[documentId]?.title}, {wordsMetadataResults[documentId]?.year}
+                    </a>
                   </>
                 )}
               </h3>
               {documentsWords.map(word => {
                 return (
                   <>
-                    <a href={`words/${word.documentId}/${word.wordId}`}>{word.word} </a>
+                    <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
                     {showIndex && <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />}
                     <br />
                   </>
