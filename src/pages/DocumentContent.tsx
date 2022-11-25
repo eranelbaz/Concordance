@@ -2,9 +2,9 @@ import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
 import { Card } from 'antd';
 import _ from 'lodash';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useAsyncEffect from 'use-async-effect';
-import { Group, WordToDocument } from '../be/db/models';
+import { Group, GroupToWords, WordToDocument } from '../be/db/models';
 
 type FixedMetadata = { author: string; album: string; title: string; year: string; id: string };
 const DocumentContent: React.FC = () => {
@@ -12,12 +12,39 @@ const DocumentContent: React.FC = () => {
   const [documentContent, setDocumentContent] = useState<WordToDocument[]>();
   const [existingGroups, setExistingGroups] = useState<Group[]>([]);
   const [groupId, setGroupId] = useState<string>();
+  const [documentWordsInGroupById, setDocumentWordsInGroupById] = useState<string[]>([]);
+  const [wordsInGroup, setWordsInGroup] = useState<GroupToWords[]>([]);
+  const documentContentByLines = useMemo(() => _(documentContent).groupBy('lineIndex').value(), [documentContent]);
 
   const documentId = document.URL.split('/').reverse()[0];
   useAsyncEffect(async () => {
     const response = await post('/getWordGroups', {});
     setExistingGroups((response.data as Group[]).filter(group => group.type === 'phrase'));
   }, []);
+
+  const onPhraseSearch = async () => {
+    const response = await post('/getWordsInGroups', { groupId });
+    const wordsInGroup = response.data as GroupToWords[];
+    setWordsInGroup(wordsInGroup);
+    const wordsInDocument = Object.keys(documentContentByLines).flatMap(lineNumber =>
+      documentContentByLines[lineNumber]?.map(word => word)
+    );
+    const chunkSize = wordsInGroup.length;
+    const wordsInDocumentChunks: WordToDocument[][] = [];
+    for (let i = 0; i < wordsInDocument.length; i += 1) {
+      const chunk = wordsInDocument.slice(i, i + chunkSize);
+      wordsInDocumentChunks.push(chunk);
+    }
+    const equals = _.flatten(
+      wordsInDocumentChunks.filter(chunk => {
+        return _.isEqual(
+          chunk.map(a => a.wordId),
+          wordsInGroup.map(b => b.wordId)
+        );
+      })
+    );
+    setDocumentWordsInGroupById(equals.map(({ id }) => id));
+  };
 
   useAsyncEffect(async () => {
     const { data: documentMetadata } = await post('/getDocumentMetadata', { documentId });
@@ -27,11 +54,6 @@ const DocumentContent: React.FC = () => {
     setDocumentContent(documentContent);
   }, [documentId]);
 
-  useCallback(async () => {
-    await post('/isGroupInDocument', { groupId, documentId });
-  }, [groupId, documentId]);
-
-  const documentContentByLines = useMemo(() => _(documentContent).groupBy('lineIndex').value(), [documentContent]);
   return documentMetadata ? (
     <PageContainer content={'Query Document'}>
       <Card>
@@ -47,13 +69,24 @@ const DocumentContent: React.FC = () => {
             <option value={group.id}>{group.name}</option>
           ))}
         </select>
-
-        <button>search</button>
+        <h2>Words in this group</h2>
+        {wordsInGroup.map(word => {
+          return (
+            <>
+              <label>{word.word} </label>
+              <br />
+            </>
+          );
+        })}
+        <button onClick={onPhraseSearch}>search</button>
         <br />
         <h2>Content</h2>
         {Object.keys(documentContentByLines).map(lineNumber => (
           <>
-            {documentContentByLines[lineNumber]?.map(word => word.word).join(' ')}
+            {documentContentByLines[lineNumber]?.map(word => {
+              if (documentWordsInGroupById.includes(word.id)) return <b>{word.word} </b>;
+              else return <label>{word.word} </label>;
+            })}
             <br />
           </>
         ))}

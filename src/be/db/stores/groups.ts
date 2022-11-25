@@ -18,13 +18,6 @@ export const getWordsInGroups = async (groupId: string) => {
   return groups;
 };
 
-export const isGroupInDocument = async (groupId: string, documentId: string) => {
-  const sql = `SELECT groupId, wordId, word, TYPE FROM \`groupsToWords\` JOIN \`words\` join \`groups\` WHERE \`groups\`.id = '${groupId}' AND \`groupsToWords\`.wordId = \`words\`.id AND \`groupsToWords\`.groupId = \`groups\`.id`;
-  const [groups] = (await execute(sql)) as [GroupToWords[], any];
-
-  return groups;
-};
-
 export const queryGroupByName = async (name: string) => {
   const data = await execute(`SELECT * FROM \`groups\` WHERE name = '${name}'`);
   return data[0][0] as Group;
@@ -48,7 +41,7 @@ export const insertToGroup = async (name: string, words: { word: string; positio
     throw new Error(`group does not exists - ${name}`);
   }
   const wordsInGroup = await getWordsInGroups(groupDBData.id);
-  const topPosition = _.max(wordsInGroup.map(wordInGroup => wordInGroup.position)) + 1 ?? 0;
+  const topPosition = _.max([-1, ...wordsInGroup.map(wordInGroup => wordInGroup.position)]) + 1 ?? 0;
   const wordsFromDB = await Promise.all(
     words.map(async word => {
       const wordDBData = await queryWord(word.word);

@@ -29,7 +29,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
-import { createGroup, getGroups, getWordsInGroups, insertToGroup, isGroupInDocument } from './db/stores/groups';
+import { createGroup, getGroups, getWordsInGroups, insertToGroup } from './db/stores/groups';
 import { getMetadata, getMetadataByDocumentId } from './db/stores/metadata';
 import { getDocumentContent, getDocumentWords, getWord, queryMetadataOfWords } from './db/stores/words';
 import { loadDocument } from './load-document';
@@ -136,14 +136,6 @@ app.post('/getWordsInGroups', async (req, res) => {
   const { groupId } = req.body;
 
   const wordsInGroup = await getWordsInGroups(groupId);
-  res.json(wordsInGroup);
-});
-
-app.post('/isGroupInDocument', async (req, res) => {
-  console.log('checking if group in document');
-  const { groupId, documentId } = req.body;
-
-  const wordsInGroup = await isGroupInDocument(groupId, documentId);
   res.json(wordsInGroup);
 });
 
