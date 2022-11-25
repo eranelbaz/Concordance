@@ -35,6 +35,7 @@ const QueryDocument: React.FC = () => {
 
   const onWordsSearch = async queryAll => {
     const idsToQuery = Array.from(document.querySelectorAll('.queryThisDocument'))
+      // @ts-ignore
       .filter(element => element.checked)
       .map(element => element.getAttribute('data-id'));
 

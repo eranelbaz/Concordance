@@ -17,6 +17,13 @@ export const getWordsInGroups = async (groupId: string) => {
   return groups;
 };
 
+export const isGroupInDocument = async (groupId: string, documentId: string) => {
+  const sql = `SELECT groupId, wordId, word, TYPE FROM \`groupsToWords\` JOIN \`words\` join \`groups\` WHERE \`groups\`.id = '${groupId}' AND \`groupsToWords\`.wordId = \`words\`.id AND \`groupsToWords\`.groupId = \`groups\`.id`;
+  const [groups] = (await execute(sql)) as [GroupToWords[], any];
+
+  return groups;
+};
+
 export const queryGroupByName = async (name: string) => {
   const data = await execute(`SELECT * FROM \`groups\` WHERE name = '${name}'`);
   return data[0][0] as Group;

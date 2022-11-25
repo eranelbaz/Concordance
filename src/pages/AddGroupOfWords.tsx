@@ -1,6 +1,7 @@
 import { post } from '@/services/client';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Card, Form } from 'antd';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAsyncEffect from 'use-async-effect';
@@ -27,9 +28,17 @@ const AddWordsToGroup: React.FC<{
 
   const onAddToGroupSubmit = async () => {
     if (isValid) {
-      const { name, words } = getValues();
+      const { name, words } = getValues() as { name: string; words: string };
 
-      const insertResponse = await post('/insertToGroupWords', { name, words: words.split('\n') });
+      const insertResponse = await post('/insertToGroupWords', {
+        name,
+        words: _(words)
+          .split('\n')
+          .map(word => word.trim())
+          .filter(word => word.length > 0)
+          .uniq()
+          .value()
+      });
       setAddGroupResponse(insertResponse.data);
       setForceFetch(Math.random());
     }
