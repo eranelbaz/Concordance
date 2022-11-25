@@ -6,7 +6,8 @@ import { Button, Card, Form } from 'antd';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { WordToDocument } from '../be/db/models';
+import useAsyncEffect from 'use-async-effect';
+import { Group, GroupToWords, WordToDocument } from '../be/db/models';
 type FixedMetadata = { author: string; album: string; title: string; year: string; id: string };
 
 const QueryDocument: React.FC = () => {
@@ -16,6 +17,20 @@ const QueryDocument: React.FC = () => {
   const [showIndex, setShowIndex] = useState(false);
   const [wordsMetadataResults, setWordsMetadataResults] = useState<Record<string, FixedMetadata>>({});
   const [byIndex, setByIndex] = useState(false);
+  const [existingGroups, setExistingGroups] = useState<Group[]>([]);
+  const [groupId, setGroupId] = useState<string>();
+  const [wordsInGroup, setWordsInGroup] = useState<GroupToWords[]>([]);
+
+  useAsyncEffect(async () => {
+    const response = await post('/getWordGroups', {});
+    setExistingGroups(response.data as Group[]);
+  }, []);
+
+  useAsyncEffect(async () => {
+    const response = await post('/getWordsInGroups', { groupId });
+    const wordsInGroup = response.data as GroupToWords[];
+    setWordsInGroup(wordsInGroup);
+  }, [groupId]);
 
   const onMetadataSubmit = async () => {
     const formData = _.omitBy(getValues(), _.isNil);
@@ -141,6 +156,12 @@ const QueryDocument: React.FC = () => {
           <input type={'checkbox'} onChange={() => setShowIndex(!showIndex)} />
           Show index
         </label>
+        <select onChange={e => setGroupId(e.target.value)}>
+          <option value={undefined}></option>
+          {existingGroups.map(group => (
+            <option value={group.id}>{group.name}</option>
+          ))}
+        </select>
         {Object.keys(wordsResults).map(documentId => {
           const documentsWords = _.uniqBy(wordsResults[documentId], 'wordId');
           return (
@@ -157,13 +178,29 @@ const QueryDocument: React.FC = () => {
                 )}
               </h3>
               {documentsWords.map(word => {
-                return (
-                  <>
-                    <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
-                    {showIndex && <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />}
-                    <br />
-                  </>
-                );
+                if (groupId && showIndex) {
+                  if (wordsInGroup.map(a => a.wordId).includes(word.wordId)) {
+                    return (
+                      <>
+                        <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
+                        {showIndex && (
+                          <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />
+                        )}
+                        <br />
+                      </>
+                    );
+                  }
+                } else {
+                  return (
+                    <>
+                      <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
+                      {showIndex && (
+                        <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />
+                      )}
+                      <br />
+                    </>
+                  );
+                }
               })}
             </>
           );
