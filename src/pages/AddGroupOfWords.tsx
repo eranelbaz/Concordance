@@ -34,9 +34,11 @@ const AddWordsToGroup: React.FC<{
         name,
         words: _(words)
           .split('\n')
-          .map(word => word.trim())
-          .filter(word => word.length > 0)
-          .uniq()
+          .map((word, position) => ({
+            word: word.trim(),
+            position
+          }))
+          .filter(word => word.word.length > 0)
           .value()
       });
       setAddGroupResponse(insertResponse.data);

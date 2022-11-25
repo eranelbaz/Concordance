@@ -106,7 +106,7 @@ app.post('/getWordGroups', async (req, res) => {
   res.json(groups);
 });
 app.post('/insertToGroupWords', async (req, res) => {
-  const { name, words } = req.body;
+  const { name, words } = req.body as { name: string; words: { word: string; position: number }[] };
 
   console.log('inserting word groups', { name, words });
   try {
