@@ -177,9 +177,22 @@ const QueryDocument: React.FC = () => {
                   </>
                 )}
               </h3>
-              {documentsWords.map(word => {
-                if (groupId && showIndex) {
-                  if (wordsInGroup.map(a => a.wordId).includes(word.wordId)) {
+              {
+                // @ts-ignore
+                documentsWords.map(word => {
+                  if (groupId && showIndex) {
+                    if (wordsInGroup.map(a => a.wordId).includes(word.wordId)) {
+                      return (
+                        <>
+                          <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
+                          {showIndex && (
+                            <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />
+                          )}
+                          <br />
+                        </>
+                      );
+                    }
+                  } else {
                     return (
                       <>
                         <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
@@ -190,18 +203,8 @@ const QueryDocument: React.FC = () => {
                       </>
                     );
                   }
-                } else {
-                  return (
-                    <>
-                      <a href={`word/${word.documentId}/${word.wordId}`}>{word.word}</a>
-                      {showIndex && (
-                        <DocumentLineContext documentWords={wordsResults[documentId]} wordId={word.wordId} />
-                      )}
-                      <br />
-                    </>
-                  );
-                }
-              })}
+                })
+              }
             </>
           );
         })}
