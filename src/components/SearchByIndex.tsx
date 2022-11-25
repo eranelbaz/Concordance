@@ -47,7 +47,7 @@ export const SearchByIndex: React.FC = () => {
         const relevantWord = wordsResults[documentId].find(
           wordData => wordData.lineIndex === parseInt(lineIndex) && wordData.wordIndex === parseInt(wordIndex)
         );
-        console.log({ wordIndex, lineIndex, relevantWord, wordsResults: wordsResults[documentId] });
+
         return (
           <>
             <h3>
@@ -58,7 +58,7 @@ export const SearchByIndex: React.FC = () => {
                 </>
               )}
             </h3>
-            {relevantWord.word}
+            {relevantWord?.word}
           </>
         );
       })}
