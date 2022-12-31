@@ -8,6 +8,25 @@ export const queryWord = async (word: string) => {
   return data[0][0] as Word;
 };
 
+export const avgWordLength = async () => {
+  const data = await execute('select avg(length(word)) as value from words');
+
+  return data[0][0].value as string;
+};
+
+export const avgWordsInLine = async () => {
+  const data = await execute('select count(*) / max(lineIndex) as value from wordsToDocuments group by documentId');
+  return data[0][0].value as string;
+};
+export const mostCommonWords = async () => {
+  const data = await execute(
+    'SELECT word from words join wordsToDocuments on words.id = wordsToDocuments.wordId group by wordId order by count(wordId) desc limit 3'
+  );
+
+  // @ts-ignore
+  return data[0].map(({ word }) => word as string).join(', ') as string;
+};
+
 export const queryMetadataOfWords = async (word: string) => {
   const data = await execute(`select metadata.* from words join wordsToDocuments
 on words.id = wordsToDocuments.wordId and words.word = '${word}'

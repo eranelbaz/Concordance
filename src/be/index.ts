@@ -31,7 +31,15 @@ import cors from 'cors';
 import express from 'express';
 import { createGroup, getGroups, getWordsInGroups, insertToGroup } from './db/stores/groups';
 import { getMetadata, getMetadataByDocumentId } from './db/stores/metadata';
-import { getDocumentContent, getDocumentWords, getWord, queryMetadataOfWords } from './db/stores/words';
+import {
+  avgWordLength,
+  avgWordsInLine,
+  getDocumentContent,
+  getDocumentWords,
+  getWord,
+  mostCommonWords,
+  queryMetadataOfWords
+} from './db/stores/words';
 import { loadDocument } from './load-document';
 
 const app = express();
@@ -116,6 +124,19 @@ app.post('/insertToGroupWords', async (req, res) => {
     const error = e as Error;
     res.send(error.message);
   }
+});
+
+app.post('/getStats', async (req, res) => {
+  const [wordLength, wordsInLine, commonWords] = await Promise.all([
+    avgWordLength(),
+    avgWordsInLine(),
+    mostCommonWords()
+  ]);
+  res.json([
+    { title: 'Average word length', value: wordLength },
+    { title: 'Average words in Line', value: wordsInLine },
+    { title: 'Top 3 most common words', value: commonWords }
+  ]);
 });
 
 app.post('/createWordGroups', async (req, res) => {
