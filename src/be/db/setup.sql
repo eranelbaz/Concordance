@@ -31,14 +31,14 @@ CREATE TABLE `wordsToDocuments` (
   `wordIndex` int,
   `documentId` varchar(36),
   FOREIGN KEY (wordId) REFERENCES `words`(id),
-  FOREIGN KEY (documentId) REFERENCES `documents`(id)
+  FOREIGN KEY (documentId) REFERENCES `documents`(id),
   UNIQUE (wordId,documentId)
 );
 
 CREATE TABLE `groups` (
   `id` varchar(36) PRIMARY KEY,
   `name` varchar(255) NOT NULL,
-  `type` varchar(36) NOT NULL
+  `type` varchar(36) NOT NULL,
   UNIQUE (name)
 );
 
@@ -51,5 +51,3 @@ CREATE TABLE `groupsToWords` (
   FOREIGN KEY (groupId) REFERENCES `groups`(id)
 );
 
-CREATE USER 'concordance'@'localhost' IDENTIFIED WITH mysql_native_password BY 'concordance';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON concordance.* TO 'concordance'@'localhost';
